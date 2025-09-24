@@ -8,7 +8,7 @@ import {
   useDataViewSelection,
   DataViewTextFilter,
   DataViewCheckboxFilter,
-  DataViewTd,
+  DataViewTrObject,
 } from '@patternfly/react-data-view';
 import { ThProps, Td, Tr, Tbody, ActionsColumn, IAction } from '@patternfly/react-table';
 import {
@@ -83,6 +83,9 @@ const useStyles = createUseStyles({
 });
 
 export const perPageKey = 'contentListPerPage';
+
+const hasOrigin = (value: unknown): value is { origin?: ContentOrigin } =>
+  typeof value === 'object' && value !== null && 'origin' in value;
 
 const ContentListTable = () => {
   const { contentOrigin, setContentOrigin, features, rbac } = useAppContext();
@@ -172,8 +175,10 @@ const ContentListTable = () => {
 
   const isRedHatRepository =
     contentOrigin.length === 1 && contentOrigin[0] === ContentOrigin.REDHAT;
+
   const isCommunityRepository =
     contentOrigin.length === 1 && contentOrigin[0] === ContentOrigin.COMMUNITY;
+
   const isRedHatOrCommunity =
     contentOrigin.length === 2 &&
     contentOrigin.includes(ContentOrigin.COMMUNITY) &&
@@ -181,6 +186,11 @@ const ContentListTable = () => {
 
   const hasReadOnlyAccess =
     !rbac?.repoWrite || isRedHatRepository || isCommunityRepository || isRedHatOrCommunity;
+
+  // Reset pagination to the first page when origin filter changes to avoid out-of-range pages
+  useEffect(() => {
+    setPage(1);
+  }, [contentOrigin]);
 
   useEffect(() => {
     if (!features?.snapshots?.accessible) return;
@@ -286,6 +296,39 @@ const ContentListTable = () => {
 
   const selection = useDataViewSelection({ matchOption: (a, b) => a.id === b.id });
   const { selected, onSelect, isSelected } = selection;
+
+  // - In custom-only views, all rows are selectable
+  // - In Red Hat-only, Community-only, or Red Hat+Community views, selection is disabled globally elsewhere
+  // - When the origin filter is empty, only custom repositories are selectable (Red Hat/EPEL disabled)
+  type SelectableRow = DataViewTr | (DataViewTrObject & { origin?: ContentOrigin });
+
+  // Determine if a row should be selectable based on the current origin filter
+  const shouldDisableSelect = useCallback(
+    (row: SelectableRow | { origin?: ContentOrigin }): boolean => {
+      const rowOrigin = hasOrigin(row) ? row.origin : undefined;
+      const isEmptyFilter = contentOrigin.length === 0;
+      if (isEmptyFilter) {
+        return rowOrigin === ContentOrigin.REDHAT || rowOrigin === ContentOrigin.COMMUNITY;
+      }
+      const hasCustom =
+        contentOrigin.includes(ContentOrigin.EXTERNAL) &&
+        contentOrigin.includes(ContentOrigin.UPLOAD);
+      if (!hasCustom) return false;
+      const disableRedHat = contentOrigin.includes(ContentOrigin.REDHAT);
+      const disableCommunity = contentOrigin.includes(ContentOrigin.COMMUNITY);
+      return (
+        (disableRedHat && rowOrigin === ContentOrigin.REDHAT) ||
+        (disableCommunity && rowOrigin === ContentOrigin.COMMUNITY)
+      );
+    },
+    [contentOrigin],
+  );
+
+  // Enhances the selection object with disablement rules
+  const selectionWithDisabledRows = useMemo(
+    () => ({ ...selection, isSelectDisabled: shouldDisableSelect }),
+    [selection, shouldDisableSelect],
+  );
 
   // Convert selected rows to selected repositories (required by Outlet context)
   const selectedRepositories = useMemo(() => {
@@ -498,9 +541,9 @@ const ContentListTable = () => {
     </Hide>
   );
 
-  // Format rows for DataView using DataViewTd objects
+  // Format rows for DataView using DataViewTr objects
   // Selection is handled by DataView selection system using id and isSelected
-  const rows: DataViewTr[] = contentList.map(
+  const rows: SelectableRow[] = contentList.map(
     ({
       uuid,
       name,
@@ -556,7 +599,7 @@ const ContentListTable = () => {
           ),
           props: { isActionCell: true },
         },
-      ] as DataViewTd[],
+      ],
     }),
   );
 
@@ -564,10 +607,11 @@ const ContentListTable = () => {
     if (value === BulkSelectValue.none) {
       onSelect(false);
     } else if (value === BulkSelectValue.page) {
-      onSelect(
-        true,
-        contentList.map(({ uuid, origin }) => ({ id: uuid, origin })),
-      );
+      // Select only selectable rows on the current page
+      const selectableRows = contentList
+        .filter(({ origin }) => !shouldDisableSelect({ origin }))
+        .map(({ uuid, origin }) => ({ id: uuid, origin }));
+      onSelect(true, selectableRows);
     } else if (value === BulkSelectValue.nonePage) {
       onSelect(
         false,
@@ -576,7 +620,16 @@ const ContentListTable = () => {
     }
   };
 
-  const pageSelected = rows.length > 0 && rows.every(isSelected);
+  // Rows on the current page that are allowed to be selected (excludes read-only Red Hat/EPEL rows)
+  const pageSelectableRows = rows.filter((row) => !shouldDisableSelect(row));
+
+  // How many of those selectable rows are currently selected
+  const pageSelectionCount = pageSelectableRows.filter(isSelected).length;
+
+  const isPageSelected =
+    pageSelectableRows.length > 0 && pageSelectionCount === pageSelectableRows.length;
+
+  const isPagePartiallySelected = pageSelectionCount > 0 && !isPageSelected;
 
   const ouiaId = 'custom_repositories_table';
 
@@ -657,39 +710,19 @@ const ContentListTable = () => {
     activeState !== DataViewState.empty &&
     activeState !== DataViewState.loading;
 
-  const isPartialSelection = rows.some(isSelected);
-
-  const allSelectedReposDeletable = [...selected.values()].every(
-    (repo) => repo.origin !== ContentOrigin.REDHAT && repo.origin !== ContentOrigin.COMMUNITY,
-  );
-
-  // Synchronize selection with the origin filter via targeted deselection (non-destructive)
+  // Synchronize selection with disabled rule: deselect items that are no longer selectable
   useEffect(() => {
-    // Do nothing when nothing is selected or when no origin constraint is applied
-    if (!selected.length || contentOrigin.length === 0) return;
-
-    const isRedHatOnlySelected =
-      contentOrigin.includes(ContentOrigin.REDHAT) && contentOrigin.length === 1;
-
-    // If only Red Hat origin is active, don't modify selection
-    // Preserving selection avoids surprising clears of custom repositories the user may have selected previously
-    if (isRedHatOnlySelected) return;
-
-    // Remove only repositories whose origin does not match the active filter (keep valid selections)
-    const invalidSelections = selected.filter(
-      (selectedRepo) => !contentOrigin.includes(selectedRepo.origin),
-    );
-    if (invalidSelections.length) {
-      onSelect(false, invalidSelections);
-    }
-  }, [contentOrigin, selected, onSelect]);
+    if (!selected.length) return;
+    const nowDisabled = selected.filter(shouldDisableSelect);
+    if (nowDisabled.length) onSelect(false, nowDisabled);
+  }, [selected, shouldDisableSelect, onSelect]);
 
   return (
     <>
       <DataView
         data-ouia-component-id='content_list_page'
         activeState={activeState}
-        {...(shouldEnableSelection && { selection })}
+        {...(shouldEnableSelection && { selection: selectionWithDisabledRows })}
         className={`${spacing.pxLg} ${spacing.ptMd} ${flex.flexDirectionColumn}`}
       >
         <DataViewToolbar
@@ -750,13 +783,17 @@ const ContentListTable = () => {
                 pageCount={contentList.length}
                 totalCount={count}
                 selectedCount={selected.length}
-                pageSelected={pageSelected}
-                pagePartiallySelected={!pageSelected && isPartialSelection}
+                pageSelected={isPageSelected}
+                pagePartiallySelected={isPagePartiallySelected}
                 onSelect={handleBulkSelect}
                 menuToggleCheckboxProps={{
                   id: 'bulk-select-checkbox',
                   isDisabled:
-                    activeState == DataViewState.empty || activeState == DataViewState.loading,
+                    activeState == DataViewState.empty ||
+                    activeState == DataViewState.loading ||
+                    // TODO: Revisit after implementing multi-page selection
+                    // Page contains no selectable rows (e.g., all repos are read-only)
+                    pageSelectableRows.length === 0,
                 }}
               />
             </Hide>
@@ -787,18 +824,19 @@ const ContentListTable = () => {
               </FlexItem>
               <FlexItem>
                 <ConditionalTooltip
+                  // TODO: Revisit after implementing multi-page selection
                   content={
                     !rbac?.repoWrite
                       ? 'You do not have the required permissions to perform this action.'
-                      : 'Some selected repositories (Red Hat or EPEL) cannot be deleted.'
+                      : 'Red Hat and EPEL repositories cannot be deleted.'
                   }
-                  show={!rbac?.repoWrite || !allSelectedReposDeletable}
+                  show={!rbac?.repoWrite || pageSelectableRows.length === 0}
                   setDisabled
                 >
                   <DeleteKebab
-                    isDisabled={!rbac?.repoWrite || !allSelectedReposDeletable}
-                    atLeastOneRepoChecked={isPartialSelection}
-                    numberOfReposChecked={selected.length}
+                    isDisabled={!rbac?.repoWrite}
+                    atLeastOneRepoChecked={pageSelectionCount > 0}
+                    numberOfReposChecked={pageSelectionCount}
                     toggleOuiaId='custom_repositories_kebab_toggle'
                   />
                 </ConditionalTooltip>
