@@ -28,7 +28,6 @@ import {
 } from 'testingHelpers';
 import { getRepositoryPathSlug } from '../helpers';
 import useLightwellRepository from '../../../Hooks/Lightwell/useLightwellRepository';
-import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
 
 jest.mock('services/Content/ContentQueries', () => ({
   useMavenPackageVersionsListQuery: jest.fn(),
@@ -56,10 +55,13 @@ jest.mock('react-router-dom', () => ({
   useSearchParams: () => [searchParams],
 }));
 
-const mockNavigateTo = jest.fn();
+jest.mock('Hooks/Lightwell/navigation/useLightwellRootPath', () => ({
+  useLightwellRootPath: jest.fn(() => '/lightwell'),
+}));
 
-jest.mock('Hooks/Lightwell/navigation/useLightwellNavigateTo', () => ({
-  useLightwellNavigateTo: jest.fn(),
+const mockUseRemoteHook = jest.fn();
+jest.mock('@scalprum/react-core', () => ({
+  useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
 }));
 
 const defaultBuilds = [
@@ -103,9 +105,6 @@ const renderPackageDetails = () =>
 
 beforeEach(() => {
   searchParams = new URLSearchParams();
-  (useLightwellNavigateTo as jest.Mock).mockReturnValue({
-    navigateTo: mockNavigateTo,
-  });
   mockUseParams.mockReturnValue({
     repoName: defaultRepoSlug,
     group: defaultLightwellRepositoryPackageItem.group,
@@ -557,34 +556,25 @@ it('copies maven coordinate to clipboard for validated java package', async () =
   );
 });
 
-it('navigates to repository packages when repository breadcrumb is clicked', async () => {
+it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
   renderPackageDetails();
 
-  await userEvent.click(await screen.findByRole('button', { name: 'Java Validated' }));
-
-  expect(mockNavigateTo).toHaveBeenCalledWith('repositoryPackages', {
-    repoSlug: defaultRepoSlug,
-    packagesParams: { search: '', page: 1 },
+  await screen.findByRole('heading', {
+    name: `${defaultLightwellRepositoryPackageItem.group}:${packageName}`,
   });
-});
 
-it('preserves list search params when navigating back to repository packages', async () => {
-  searchParams = new URLSearchParams('search=requests&page=2');
-
-  renderPackageDetails();
-
-  await userEvent.click(await screen.findByRole('button', { name: 'Java Validated' }));
-
-  expect(mockNavigateTo).toHaveBeenCalledWith('repositoryPackages', {
-    repoSlug: defaultRepoSlug,
-    packagesParams: { search: 'requests', page: 2 },
+  expect(mockUseRemoteHook).toHaveBeenCalledWith({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: [
+      [
+        { pathname: '/lightwell', title: 'Lightwell' },
+        { pathname: `/lightwell/${defaultRepoSlug}`, title: 'Java Validated' },
+        {
+          pathname: `/lightwell/${defaultRepoSlug}/${encodeURIComponent(defaultLightwellRepositoryPackageItem.group)}/${encodeURIComponent(packageName)}`,
+          title: `${defaultLightwellRepositoryPackageItem.group}:${packageName}`,
+        },
+      ],
+    ],
   });
-});
-
-it('navigates to repositories when Lightwell breadcrumb is clicked', async () => {
-  renderPackageDetails();
-
-  await userEvent.click(await screen.findByRole('button', { name: 'Lightwell' }));
-
-  expect(mockNavigateTo).toHaveBeenCalledWith('repositories');
 });

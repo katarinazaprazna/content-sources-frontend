@@ -33,6 +33,15 @@ jest.mock('Hooks/Lightwell/navigation/useLightwellNavigateTo', () => ({
   useLightwellNavigateTo: jest.fn(),
 }));
 
+jest.mock('Hooks/Lightwell/navigation/useLightwellRootPath', () => ({
+  useLightwellRootPath: jest.fn(() => '/lightwell'),
+}));
+
+const mockUseRemoteHook = jest.fn();
+jest.mock('@scalprum/react-core', () => ({
+  useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
+}));
+
 const mockUseParams = jest.fn(() => ({
   repoName: getRepositoryPathSlug(
     defaultLightwellContentItem.content_type,
@@ -162,7 +171,7 @@ it('renders with a single package', async () => {
 
   renderPackagesTable();
 
-  expect(screen.queryAllByText('Java Validated')).toHaveLength(2);
+  expect(screen.queryAllByText('Java Validated')).toHaveLength(1);
   expect(
     await screen.findByText('https://example.com/lightwell/java/validated'),
   ).toBeInTheDocument();
@@ -231,12 +240,24 @@ it('navigates to package details when a package name is clicked', async () => {
   });
 });
 
-it('navigates to repositories when Lightwell breadcrumb is clicked', async () => {
+it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
   renderPackagesTable();
 
-  await userEvent.click(await screen.findByRole('button', { name: 'Lightwell' }));
+  await screen.findByRole('heading', { name: 'Java Validated' });
 
-  expect(mockNavigateTo).toHaveBeenCalledWith('repositories');
+  expect(mockUseRemoteHook).toHaveBeenCalledWith({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: [
+      [
+        { pathname: '/lightwell', title: 'Lightwell' },
+        {
+          pathname: `/lightwell/${getRepositoryPathSlug(defaultLightwellContentItem.content_type, defaultLightwellContentItem.security_level)}`,
+          title: 'Java Validated',
+        },
+      ],
+    ],
+  });
 });
 
 it('copies the maven coordinate when a validated version label is clicked', async () => {

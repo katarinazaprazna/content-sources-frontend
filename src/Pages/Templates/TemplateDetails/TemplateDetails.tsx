@@ -1,7 +1,5 @@
 import {
   Alert,
-  Breadcrumb,
-  BreadcrumbItem,
   DescriptionList,
   Flex,
   Grid,
@@ -14,10 +12,14 @@ import {
   ToolbarContent,
   ToolbarItem,
 } from '@patternfly/react-core';
+import { useRemoteHook } from '@scalprum/react-core';
+import { useMemo } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
+import { TEMPLATES_ROUTE } from 'Routes/constants';
 import { useFetchTemplate } from 'services/Templates/TemplateQueries';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
+import useRootPath from 'Hooks/useRootPath';
 import DetailItem from './components/DetaiItem';
 import Hide from 'components/Hide/Hide';
 import { formatDateDDMMMYYYY } from 'helpers';
@@ -25,7 +27,6 @@ import Loader from 'components/Loader';
 import TemplateActionDropdown from './components/TemplateActionDropdown';
 import TemplateDetailsTabs from './components/TemplateDetailsTabs';
 import { abbreviateStreamName } from '../TemplatesTable/helpers';
-import { useNavigateTo } from 'Hooks/navigation/useNavigateTo';
 
 const useStyles = createUseStyles({
   fullHeight: {
@@ -57,8 +58,7 @@ const useStyles = createUseStyles({
 export default function TemplateDetails() {
   const classes = useStyles();
   const { templateUUID } = useParams();
-
-  const navigateToTemplateList = useNavigateTo('templates');
+  const rootPath = useRootPath();
 
   const { data: template, isError, error, isLoading } = useFetchTemplate(templateUUID as string);
 
@@ -72,6 +72,20 @@ export default function TemplateDetails() {
     getStreamName,
   } = useDistributionDetails();
 
+  const breadcrumbs = useMemo(
+    () => [
+      { pathname: `${rootPath}/${TEMPLATES_ROUTE}`, title: 'Templates' },
+      { pathname: `${rootPath}/${TEMPLATES_ROUTE}/${templateUUID}`, title: template?.name || '' },
+    ],
+    [rootPath, templateUUID, template?.name],
+  );
+
+  useRemoteHook({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: [breadcrumbs],
+  });
+
   // Error is caught in the wrapper component
   if (isError) throw error;
   if (repositoryParamsIsError) throw repositoryParamsError;
@@ -84,14 +98,6 @@ export default function TemplateDetails() {
     <>
       <Grid className={classes.topContainer}>
         <Stack>
-          <StackItem>
-            <Breadcrumb ouiaId='template_details_breadcrumb'>
-              <BreadcrumbItem component='button' onClick={navigateToTemplateList}>
-                Templates
-              </BreadcrumbItem>
-              <BreadcrumbItem disabled>{template?.name}</BreadcrumbItem>
-            </Breadcrumb>
-          </StackItem>
           <StackItem className={classes.titleWrapper}>
             <Flex
               direction={{ default: 'row' }}
