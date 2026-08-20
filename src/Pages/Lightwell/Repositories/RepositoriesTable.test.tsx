@@ -15,6 +15,12 @@ import { useLightwellNotificationPrefs } from './hooks/useLightwellNotificationP
 import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
 import { useLightwellRepoNotifications } from './hooks/useLightwellRepoNotifications';
 
+const mockUseRemoteHook = jest.fn();
+
+jest.mock('@scalprum/react-core', () => ({
+  useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
+}));
+
 jest.mock('services/Content/ContentQueries', () => ({
   useContentListQuery: jest.fn(),
   useLightwellRepositoryPackageCountsQuery: jest.fn(),
@@ -24,6 +30,10 @@ const mockNavigateTo = jest.fn();
 
 jest.mock('Hooks/Lightwell/navigation/useLightwellNavigateTo', () => ({
   useLightwellNavigateTo: jest.fn(),
+}));
+
+jest.mock('Hooks/Lightwell/navigation/useLightwellRootPath', () => ({
+  useLightwellRootPath: jest.fn(() => '/lightwell'),
 }));
 
 jest.mock('../constants', () => ({
@@ -424,4 +434,24 @@ it('subscribes to predisclosure repository notifications when toggle is turned o
     'critical',
     'important',
   ]);
+});
+
+it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
+  (useContentListQuery as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    data: {
+      data: [defaultLightwellContentItem],
+      meta: { count: 1, limit: 20, offset: 0 },
+    },
+  }));
+
+  renderRepositoriesTable();
+
+  await screen.findByText('Java Validated');
+
+  expect(mockUseRemoteHook).toHaveBeenCalledWith({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: [expect.arrayContaining([expect.objectContaining({ title: 'Lightwell' })])],
+  });
 });
