@@ -1,5 +1,7 @@
 import {
   Alert,
+  Breadcrumb,
+  BreadcrumbItem,
   DescriptionList,
   Flex,
   Grid,
@@ -13,6 +15,7 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { useMemo } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
@@ -27,6 +30,7 @@ import Loader from 'components/Loader';
 import TemplateActionDropdown from './components/TemplateActionDropdown';
 import TemplateDetailsTabs from './components/TemplateDetailsTabs';
 import { abbreviateStreamName } from '../TemplatesTable/helpers';
+import { useNavigateTo } from 'Hooks/navigation/useNavigateTo';
 
 const useStyles = createUseStyles({
   fullHeight: {
@@ -60,6 +64,9 @@ export default function TemplateDetails() {
   const { templateUUID } = useParams();
   const rootPath = useRootPath();
 
+  const navigateToTemplateList = useNavigateTo('templates');
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
+
   const { data: template, isError, error, isLoading } = useFetchTemplate(templateUUID as string);
 
   const {
@@ -83,7 +90,7 @@ export default function TemplateDetails() {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: [breadcrumbs],
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
   });
 
   // Error is caught in the wrapper component
@@ -98,6 +105,16 @@ export default function TemplateDetails() {
     <>
       <Grid className={classes.topContainer}>
         <Stack>
+          {!appBreadcrumbsEnabled && (
+            <StackItem>
+              <Breadcrumb ouiaId='template_details_breadcrumb'>
+                <BreadcrumbItem component='button' onClick={navigateToTemplateList}>
+                  Templates
+                </BreadcrumbItem>
+                <BreadcrumbItem isActive>{template?.name}</BreadcrumbItem>
+              </Breadcrumb>
+            </StackItem>
+          )}
           <StackItem className={classes.titleWrapper}>
             <Flex
               direction={{ default: 'row' }}

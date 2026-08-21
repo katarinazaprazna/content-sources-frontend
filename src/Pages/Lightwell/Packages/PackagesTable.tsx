@@ -1,4 +1,6 @@
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   Card,
   Content,
@@ -18,6 +20,7 @@ import {
   Timestamp,
 } from '@patternfly/react-core';
 import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { CodeIcon, JavaIcon, PythonIcon } from '@patternfly/react-icons';
 import { SkeletonTable } from '@patternfly/react-component-groups';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -244,6 +247,7 @@ const PackagesTable = () => {
   }, [useMock, repoUUID, debouncedSearch, page, perPage, packagesData]);
 
   const rootPath = useLightwellRootPath();
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
   const breadcrumbRepoName = repository
     ? formatRepositoryName(repository.content_type, repository.security_level, repository.name)
     : '';
@@ -259,7 +263,7 @@ const PackagesTable = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: [breadcrumbs],
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
   });
 
   const fetchingOrLoading = useMock ? false : isPackagesLoading || isPackagesFetching;
@@ -329,6 +333,16 @@ const PackagesTable = () => {
     <>
       <Grid className={classes.topContainer}>
         <Stack>
+          {!appBreadcrumbsEnabled && (
+            <StackItem>
+              <Breadcrumb ouiaId='lightwell-packages-breadcrumb'>
+                <BreadcrumbItem component='button' onClick={() => navigateTo('repositories')}>
+                  Lightwell
+                </BreadcrumbItem>
+                <BreadcrumbItem isActive>{breadcrumbRepoName}</BreadcrumbItem>
+              </Breadcrumb>
+            </StackItem>
+          )}
           <StackItem className={classes.titleWrapper}>
             <Flex
               alignItems={{ default: 'alignItemsCenter' }}

@@ -21,6 +21,10 @@ jest.mock('@scalprum/react-core', () => ({
   useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
 }));
 
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: jest.fn(() => true),
+}));
+
 jest.mock('services/Content/ContentQueries', () => ({
   useContentListQuery: jest.fn(),
   useLightwellRepositoryPackageCountsQuery: jest.fn(),

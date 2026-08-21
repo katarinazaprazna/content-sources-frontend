@@ -42,6 +42,10 @@ jest.mock('@scalprum/react-core', () => ({
   useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
 }));
 
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: jest.fn(() => true),
+}));
+
 const mockUseParams = jest.fn(() => ({
   repoName: getRepositoryPathSlug(
     defaultLightwellContentItem.content_type,

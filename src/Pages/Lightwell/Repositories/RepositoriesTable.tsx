@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import { CodeIcon, JavaIcon, PythonIcon, BellIcon } from '@patternfly/react-icons';
 import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { SkeletonTable } from '@patternfly/react-component-groups';
 import {
   Table,
@@ -90,12 +91,13 @@ const RepositoriesTable = () => {
     feature_name: isDemo ? LIGHTWELL_DEMO_FEATURE_NAME : LIGHTWELL_FEATURE_NAME,
   };
 
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
   const breadcrumbs = useMemo(() => [{ pathname: rootPath, title: 'Lightwell' }], [rootPath]);
 
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: [breadcrumbs],
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
   });
 
   const useMock = LIGHTWELL_USE_MOCK;

@@ -1,4 +1,6 @@
 import {
+  Breadcrumb,
+  BreadcrumbItem,
   Button,
   Card,
   CardBody,
@@ -20,8 +22,10 @@ import {
   Tabs,
   TabTitleText,
   Title,
+  Truncate,
 } from '@patternfly/react-core';
 import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { CodeIcon, JavaIcon, PythonIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { createUseStyles } from 'react-jss';
@@ -55,6 +59,7 @@ import PackageOverviewTab from './components/PackageOverviewTab';
 import PackageReleasesTab, { buildVersionFromRelease } from './components/PackageReleasesTab';
 import PackageSidebar from './components/PackageSidebar';
 import PackageVersionsTab from './components/PackageVersionsTab';
+import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
 import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 
 const useStyles = createUseStyles({
@@ -71,6 +76,7 @@ const useStyles = createUseStyles({
 
 const PackageDetails = () => {
   const classes = useStyles();
+  const { navigateTo } = useLightwellNavigateTo();
   const rootPath = useLightwellRootPath();
 
   const {
@@ -104,6 +110,8 @@ const PackageDetails = () => {
   const isMaven = repository?.content_type === 'maven';
   const isPython = repository?.content_type === 'python';
 
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
+
   const breadcrumbRepoName = repository
     ? formatRepositoryName(repository.content_type, repository.security_level, repository.name)
     : '';
@@ -125,7 +133,7 @@ const PackageDetails = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: [breadcrumbs],
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
   });
 
   const mavenVersionsListQuery = useMavenPackageVersionsListQuery(
@@ -302,6 +310,26 @@ const PackageDetails = () => {
     <>
       <Grid className={classes.topContainer}>
         <Stack>
+          {!appBreadcrumbsEnabled && (
+            <StackItem>
+              <Breadcrumb ouiaId='lightwell-package-details-breadcrumb'>
+                <BreadcrumbItem component='button' onClick={() => navigateTo('repositories')}>
+                  Lightwell
+                </BreadcrumbItem>
+                <BreadcrumbItem
+                  component='button'
+                  onClick={() => navigateTo('repositoryPackages', { repoSlug })}
+                >
+                  {breadcrumbRepoName}
+                </BreadcrumbItem>
+                <BreadcrumbItem isActive>
+                  <Truncate
+                    content={isMaven ? `${packageGroup}:${packageName}` : packageName || '—'}
+                  />
+                </BreadcrumbItem>
+              </Breadcrumb>
+            </StackItem>
+          )}
           <StackItem className={classes.titleWrapper}>
             <Flex
               alignItems={{ default: 'alignItemsCenter' }}

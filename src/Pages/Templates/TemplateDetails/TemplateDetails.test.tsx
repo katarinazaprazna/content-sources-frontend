@@ -17,6 +17,14 @@ jest.mock('@scalprum/react-core', () => ({
   useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
 }));
 
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: jest.fn(() => true),
+}));
+
+jest.mock('Hooks/navigation/useNavigateTo', () => ({
+  useNavigateTo: jest.fn(() => jest.fn()),
+}));
+
 jest.mock('services/Templates/TemplateQueries', () => ({
   useFetchTemplate: jest.fn(),
 }));

@@ -64,6 +64,15 @@ jest.mock('@scalprum/react-core', () => ({
   useRemoteHook: (...args: unknown[]) => mockUseRemoteHook(...args),
 }));
 
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: jest.fn(() => true),
+}));
+
+const mockNavigateTo = jest.fn();
+jest.mock('Hooks/Lightwell/navigation/useLightwellNavigateTo', () => ({
+  useLightwellNavigateTo: jest.fn(() => ({ navigateTo: mockNavigateTo })),
+}));
+
 const defaultBuilds = [
   { version: '3.14.0', release: 'rhlw-00001', created_at: '2026-07-01T00:00:00Z' },
 ];
