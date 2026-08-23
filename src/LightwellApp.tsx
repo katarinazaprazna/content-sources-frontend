@@ -36,6 +36,7 @@ export default function LightwellApp() {
           <Route path='demo' element={<LightwellDemoLayout />}>
             <Route index element={<RepositoriesTable />} />
             <Route path='beacon' element={<Beacon />} />
+            <Route path='lens' element={<CoverageAnalyzer />} />
             <Route path=':repoName/:group/:packageName' element={<PackageDetails />} />
             <Route path=':repoName/:packageName' element={<PackageDetails />} />
             <Route path=':repoName' element={<PackagesTable />} />
