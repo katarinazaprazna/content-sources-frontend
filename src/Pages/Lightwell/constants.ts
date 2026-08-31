@@ -15,7 +15,8 @@ export {
 
 export const INSTANT_EMAIL_SUBSCRIPTION_TYPE: NotificationSubscriptionType = 'instant_email';
 
-export const LIGHTWELL_FEATURE_NAME = 'lightwell-network';
+export const LIGHTWELL_FEATURE_NAME =
+  'lightwell-network,lightwell-clearinghouse,lightwell-research-institutions';
 export const LIGHTWELL_DEMO_FEATURE_NAME = 'lightwell-network-demo';
 export const LIGHTWELL_ROUTE = '/lightwell';
 export const LIGHTWELL_ORIGIN = 'lightwell';
