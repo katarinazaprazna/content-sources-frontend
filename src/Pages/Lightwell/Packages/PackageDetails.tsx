@@ -123,7 +123,7 @@ const PackageDetails = () => {
 
   const breadcrumbs = useMemo(
     () => [
-      { pathname: rootPath, title: 'Lightwell' },
+      { pathname: rootPath, title: 'Lightwell Repositories' },
       { pathname: `${rootPath}/${repoSlug}`, title: breadcrumbRepoName },
       { pathname: breadcrumbPackagePath, title: breadcrumbPackageName },
     ],
@@ -314,7 +314,7 @@ const PackageDetails = () => {
             <StackItem>
               <Breadcrumb ouiaId='lightwell-package-details-breadcrumb'>
                 <BreadcrumbItem component='button' onClick={() => navigateTo('repositories')}>
-                  Lightwell
+                  Lightwell Repositories
                 </BreadcrumbItem>
                 <BreadcrumbItem
                   component='button'

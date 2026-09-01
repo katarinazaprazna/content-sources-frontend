@@ -92,7 +92,10 @@ const RepositoriesTable = () => {
   };
 
   const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
-  const breadcrumbs = useMemo(() => [{ pathname: rootPath, title: 'Lightwell' }], [rootPath]);
+  const breadcrumbs = useMemo(
+    () => [{ pathname: rootPath, title: 'Lightwell Repositories' }],
+    [rootPath],
+  );
 
   useRemoteHook({
     scope: 'chrome',

@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
+import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import {
   Button,
   Card,
@@ -27,6 +29,7 @@ import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import UserIcon from '@patternfly/react-icons/dist/esm/icons/user-icon';
 
 import useDebounce from 'Hooks/useDebounce';
+import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 import LightwellPageHeader from '../components/LightwellPageHeader';
 import { SEVERITIES, STATUSES } from './constants';
 import type { Severity, Status } from './types';
@@ -76,6 +79,19 @@ function buildBeaconFilters(
 }
 
 const Beacon = () => {
+  const rootPath = useLightwellRootPath();
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
+  const breadcrumbs = useMemo(
+    () => [{ pathname: `${rootPath}/beacon`, title: 'Lightwell Beacon' }],
+    [rootPath],
+  );
+
+  useRemoteHook({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+  });
+
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>();
   const [selectedSeverities, setSelectedSeverities] = useState<Set<Severity>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<Status>>(new Set());

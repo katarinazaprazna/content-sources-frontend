@@ -577,7 +577,7 @@ it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
     module: './breadcrumbs/useReplaceBreadcrumbs',
     args: [
       [
-        { pathname: '/lightwell', title: 'Lightwell' },
+        { pathname: '/lightwell', title: 'Lightwell Repositories' },
         { pathname: `/lightwell/${defaultRepoSlug}`, title: 'Java Validated' },
         {
           pathname: `/lightwell/${defaultRepoSlug}/${encodeURIComponent(defaultLightwellRepositoryPackageItem.group)}/${encodeURIComponent(packageName)}`,

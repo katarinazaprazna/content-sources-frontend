@@ -7,6 +7,18 @@ import { apiError, taskError } from './utils/errors';
 
 jest.mock('./hooks/useManifestUpload');
 
+jest.mock('@scalprum/react-core', () => ({
+  useRemoteHook: jest.fn(),
+}));
+
+jest.mock('@unleash/proxy-client-react', () => ({
+  useFlag: jest.fn(() => true),
+}));
+
+jest.mock('Hooks/Lightwell/navigation/useLightwellRootPath', () => ({
+  useLightwellRootPath: jest.fn(() => '/lightwell'),
+}));
+
 const defaultUploadProps: ManifestUploadCardProps = {
   file: undefined,
   fileError: undefined,

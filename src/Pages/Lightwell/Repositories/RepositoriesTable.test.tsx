@@ -456,6 +456,6 @@ it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
   expect(mockUseRemoteHook).toHaveBeenCalledWith({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: [expect.arrayContaining([expect.objectContaining({ title: 'Lightwell' })])],
+    args: [expect.arrayContaining([expect.objectContaining({ title: 'Lightwell Repositories' })])],
   });
 });

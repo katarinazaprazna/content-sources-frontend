@@ -1,11 +1,27 @@
+import { useMemo } from 'react';
+import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import { PageSection, Stack, StackItem } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import LightwellPageHeader from '../components/LightwellPageHeader';
 import { useManifestUpload } from './hooks/useManifestUpload';
 import ManifestUploadCard from './components/ManifestUploadCard';
+import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 
 const ManifestUpload = () => {
   const { uploadProps } = useManifestUpload();
+  const rootPath = useLightwellRootPath();
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
+  const breadcrumbs = useMemo(
+    () => [{ pathname: `${rootPath}/lens`, title: 'Lightwell Lens' }],
+    [rootPath],
+  );
+
+  useRemoteHook({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+  });
 
   return (
     <>

@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import { useRemoteHook } from '@scalprum/react-core';
+import { useFlag } from '@unleash/proxy-client-react';
 import LightwellPageHeader from '../components/LightwellPageHeader';
 import {
   Button,
@@ -25,10 +27,23 @@ import { usePackageCoverageTable } from './hooks/usePackageCoverageTable';
 import Loader from 'components/Loader';
 import LightwellNotFound from '../components/LightwellNotFound';
 import type { EcosystemInfo } from './utils/ecosystem';
+import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 
 const CoverageReport = () => {
   const { reportUUID } = useParams();
   const { filename, report, isLoading, isError, error, startOver } = useCoverageReport(reportUUID);
+  const rootPath = useLightwellRootPath();
+  const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');
+  const breadcrumbs = useMemo(
+    () => [{ pathname: `${rootPath}/lens`, title: 'Lightwell Lens' }],
+    [rootPath],
+  );
+
+  useRemoteHook({
+    scope: 'chrome',
+    module: './breadcrumbs/useReplaceBreadcrumbs',
+    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+  });
 
   const ecosystems: EcosystemInfo[] = useMemo(
     () =>
