@@ -1,10 +1,26 @@
+// Overlay TrustArc's #consent_blackbar and shorten the Chrome shell so content isn't under it
 
-// TrustArc "Cookie preferences" link is injected by Chrome and pushed off-screen,
-// causing an unwanted scrollbar. Fix it in the bottom-left corner instead.
-.truste_caIcon_display {
-    position: fixed !important;
-    bottom: 16px !important;
-    left: 16px !important;
-    z-index: 1000 !important;
-    overflow: visible !important;
+// Overlay height we steal from Chrome (text height + padding-top)
+$cookie-slot: calc(1rem + var(--pf-t--global--spacer--md));
+
+#chrome-app-render-root {
+  height: calc(100vh - #{$cookie-slot}) !important;
+  height: calc(100dvh - #{$cookie-slot}) !important;
+  max-height: calc(100vh - #{$cookie-slot}) !important;
+  max-height: calc(100dvh - #{$cookie-slot}) !important;
+}
+
+#consent_blackbar {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 1000 !important;
+  padding: var(--pf-t--global--spacer--md);
+}
+
+#consent_blackbar a {
+  position: static !important;
+  display: block !important;
+  width: max-content !important;
+  text-decoration: underline dashed !important;
 }

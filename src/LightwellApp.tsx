@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom';
 import Loader from 'components/Loader';
 
 import { ErrorPage } from 'components/Error/ErrorPage';
+import { useTrustArcCookieInBlackbar } from 'Hooks/Lightwell/useTrustArcCookieInBlackbar';
 import usePageSafe from 'Hooks/usePageSafe';
 import PackagesTable from 'Pages/Lightwell/Packages/PackagesTable';
 import PackageDetails from 'Pages/Lightwell/Packages/PackageDetails';
@@ -21,6 +22,9 @@ export default function LightwellApp() {
   const pageSafe = usePageSafe();
   const { hideGlobalFilter } = useChrome();
   const { features, isFetchingPermissions } = useAppContext();
+
+  // Remove when Platform ships a footer
+  useTrustArcCookieInBlackbar();
 
   useEffect(() => {
     hideGlobalFilter(true);
