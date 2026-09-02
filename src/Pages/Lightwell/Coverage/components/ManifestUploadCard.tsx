@@ -14,7 +14,7 @@ import { UploadIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import ManifestFormatPopover from './ManifestFormatPopover';
 
-import type { ProcessStep } from '../hooks/useCoverageAnalysis';
+import type { ProcessStep } from '../hooks/useManifestUpload';
 import type { ProcessError } from '../utils/errors';
 import AnalysisProgress from './AnalysisProgress';
 

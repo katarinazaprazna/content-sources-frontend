@@ -1,7 +1,6 @@
 import { appendSearchParams, type LightwellPackagesParams } from '../lightwellPackagesParams';
 
-export type LightwellDestinationKey =
-  'repositories' | 'repositoryPackages' | 'packageDetails' | 'lens';
+export type LightwellDestinationKey = 'repositories' | 'repositoryPackages' | 'packageDetails';
 
 export type LightwellNavigationParams = {
   rootPath: string;
@@ -27,7 +26,6 @@ type BuildLightwellPath = (params: LightwellNavigationParams) => string;
  */
 export const lightwellNavigationPaths: Record<LightwellDestinationKey, BuildLightwellPath> = {
   repositories: ({ rootPath }) => rootPath,
-  lens: ({ rootPath }) => `${rootPath}/lens`,
   repositoryPackages: ({ rootPath, repoSlug, packagesParams }) =>
     appendSearchParams(`${rootPath}/${repoSlug}`, packagesParams ?? { search: '', page: 1 }),
   packageDetails: ({ rootPath, repoSlug, packageName, groupId, packagesParams }) => {
@@ -37,4 +35,10 @@ export const lightwellNavigationPaths: Record<LightwellDestinationKey, BuildLigh
 
     return appendSearchParams(path, packagesParams ?? { search: '', page: 1 });
   },
+};
+
+export const lensNavigationPaths = {
+  lens: (rootPath: string) => `${rootPath}/lens`,
+  lensReport: (rootPath: string, reportUUID: string) =>
+    `${rootPath}/lens/${encodeURIComponent(reportUUID)}`,
 };

@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useCreateCoverageReportMutation,
   useCoverageReportQuery,
 } from 'services/Lightwell/CoverageReportsQueries';
 import { validateManifestFile, getMaxFileSizeMB, toBytes } from '../utils/validateManifestFile';
-import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 import { LIGHTWELL_LENS_USE_MOCK } from 'Pages/Lightwell/constants';
-import { MOCK_ANALYSIS } from '../../mockCoverageAnalysis';
+import { MOCK_UPLOAD } from '../../mockCoverageAnalysis';
 import type { ManifestUploadCardProps } from '../components/ManifestUploadCard';
 import { apiError, taskError, timeoutError, type ProcessError } from '../utils/errors';
+import { useLightwellNavigateTo } from 'Hooks/Lightwell/navigation/useLightwellNavigateTo';
 
 export type ProcessStep = 'select' | 'uploading' | 'analyzing' | 'complete' | 'error';
 
 const POLLING_RETRY_LIMIT = 40;
 
-export const useCoverageAnalysis = () => {
-  if (LIGHTWELL_LENS_USE_MOCK) return MOCK_ANALYSIS;
+export const useManifestUpload = () => {
+  if (LIGHTWELL_LENS_USE_MOCK) return MOCK_UPLOAD;
 
   const [step, setStep] = useState<ProcessStep>('select');
   const [file, setFile] = useState<File | undefined>();
@@ -23,59 +23,80 @@ export const useCoverageAnalysis = () => {
   const [fileError, setFileError] = useState<string | undefined>();
   const [processError, setProcessError] = useState<ProcessError | undefined>();
   const [pollCount, setPollCount] = useState(0);
+  const [filename, setFilename] = useState<string | undefined>();
+  const { navigateToLensReport } = useLightwellNavigateTo();
 
-  const isPolling = step === 'analyzing' && pollCount <= POLLING_RETRY_LIMIT;
   const createReport = useCreateCoverageReportMutation();
+
+  const shouldPoll = step === 'analyzing' && !!reportUUID;
+  const isPolling = shouldPoll && pollCount <= POLLING_RETRY_LIMIT;
   const { data: report, isError: isFetchError } = useCoverageReportQuery(reportUUID, isPolling);
 
   useEffect(() => {
-    if (step !== 'analyzing') return;
+    if (!shouldPoll || !report) return;
+
     setPollCount((count) => count + 1);
 
-    if (!report) return;
     if (report.status === 'completed') {
       setStep('complete');
-    } else if (report.status === 'failed') {
+      return;
+    }
+
+    if (report.status === 'failed') {
       setProcessError(taskError(report.analysis_task_error));
       setStep('error');
     }
-  }, [report, step]);
+  }, [report, shouldPoll]);
 
   useEffect(() => {
+    if (step !== 'complete' || !reportUUID || !filename) return;
+
+    navigateToLensReport(reportUUID, { state: { filename } });
+  }, [step, reportUUID, filename, navigateToLensReport]);
+
+  useEffect(() => {
+    if (!shouldPoll) return;
+
     if (pollCount > POLLING_RETRY_LIMIT) {
       setProcessError(timeoutError());
       setStep('error');
       return;
     }
+
     if (isFetchError) {
       setProcessError(apiError('fetch'));
       setStep('error');
     }
-  }, [pollCount, isFetchError]);
+  }, [pollCount, isFetchError, shouldPoll]);
 
   // Uses dropzoneProps.onDropAccepted instead of onFileInputChange to avoid a PF bug
   // where onFileInputChange fires twice when selecting a file via the browser dialog
   const handleFileAccepted = (acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
     const limitMB = getMaxFileSizeMB(selectedFile.name);
+
     if (selectedFile.size > toBytes(limitMB)) {
       setFileError(`File exceeds the ${limitMB} MB size limit. Please try a smaller file.`);
       setFile(selectedFile);
       return;
     }
+
     if (!validateManifestFile(selectedFile)) {
       setFileError('Could not detect format. Please check your file.');
       setFile(selectedFile);
       return;
     }
+
     setFileError(undefined);
     setFile(selectedFile);
+    setProcessError(undefined);
+    setFilename(selectedFile.name);
     setStep('uploading');
+
     createReport.mutate(selectedFile, {
       onSuccess: (data) => {
-        if (data.uuid) {
-          setReportUUID(data.uuid);
-        }
+        setPollCount(0);
+        setReportUUID(data.uuid);
         setStep('analyzing');
       },
       onError: () => {
@@ -85,32 +106,25 @@ export const useCoverageAnalysis = () => {
     });
   };
 
-  const startOver = () => {
+  const handleRetry = () => {
     setStep('select');
     setFile(undefined);
     setReportUUID('');
     setFileError(undefined);
     setProcessError(undefined);
     setPollCount(0);
+    setFilename(undefined);
   };
-
-  const completedReport: CompletedCoverageReport | undefined =
-    report?.status === 'completed' ? report : undefined;
 
   const uploadProps: ManifestUploadCardProps = {
     file,
     fileError,
     processError,
-    step,
+    step: step === 'complete' ? 'analyzing' : step,
     reportUUID,
     onDropAccepted: handleFileAccepted,
-    onRetry: startOver,
+    onRetry: handleRetry,
   };
 
-  return {
-    filename: file?.name,
-    report: completedReport,
-    uploadProps,
-    startOver,
-  };
+  return { uploadProps };
 };

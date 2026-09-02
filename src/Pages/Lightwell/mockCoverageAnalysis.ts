@@ -24,15 +24,21 @@ const mockUploadProps: ManifestUploadCardProps = {
   file: undefined,
   fileError: undefined,
   processError: undefined,
-  step: 'complete',
-  reportUUID: 'mock-report',
+  step: 'select',
+  reportUUID: '',
   onDropAccepted: () => undefined,
   onRetry: () => undefined,
 };
 
-export const MOCK_ANALYSIS = {
+export const MOCK_UPLOAD = {
+  uploadProps: mockUploadProps,
+};
+
+export const MOCK_REPORT_VIEW = {
   filename: 'Vuln-Report_2026-08-18.csv',
   report: MOCK_REPORT,
-  uploadProps: mockUploadProps,
+  isLoading: false,
+  isError: false,
+  error: null,
   startOver: () => undefined,
 };

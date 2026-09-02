@@ -58,4 +58,26 @@ describe('useLightwellNavigateTo', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith('/root/repo-slug/package-name');
   });
+
+  it('navigates to lens', () => {
+    const { result } = renderHook(() => useLightwellNavigateTo());
+
+    act(() => result.current.navigateToLens());
+
+    expect(mockNavigate).toHaveBeenCalledWith('/root/lens');
+  });
+
+  it('navigates to lens report with router state', () => {
+    const { result } = renderHook(() => useLightwellNavigateTo());
+
+    act(() =>
+      result.current.navigateToLensReport('report-uuid', {
+        state: { filename: 'manifest.json' },
+      }),
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith('/root/lens/report-uuid', {
+      state: { filename: 'manifest.json' },
+    });
+  });
 });

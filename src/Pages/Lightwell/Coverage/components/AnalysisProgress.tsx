@@ -11,7 +11,7 @@ import {
 import { CheckCircleIcon, ExclamationCircleIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import type { ProcessStep } from '../hooks/useCoverageAnalysis';
+import type { ProcessStep } from '../hooks/useManifestUpload';
 import { type ProcessError } from '../utils/errors';
 
 const ANALYSIS_STEPS = [

@@ -12,10 +12,11 @@ import PackagesTable from 'Pages/Lightwell/Packages/PackagesTable';
 import PackageDetails from 'Pages/Lightwell/Packages/PackageDetails';
 import RepositoriesTable from 'Pages/Lightwell/Repositories/RepositoriesTable';
 import Beacon from 'Pages/Lightwell/Beacon/Beacon';
-import CoverageAnalyzer from 'Pages/Lightwell/Coverage/CoverageAnalyzer';
 import LightwellNotFound from 'Pages/Lightwell/components/LightwellNotFound';
 import { LightwellDemoLayout } from 'Pages/Lightwell/LightwellDemoContext';
 import { useAppContext } from './middleware/AppContext';
+import CoverageReport from 'Pages/Lightwell/Coverage/CoverageReport';
+import ManifestUpload from 'Pages/Lightwell/Coverage/ManifestUpload';
 
 export default function LightwellApp() {
   const pageSafe = usePageSafe();
@@ -44,7 +45,10 @@ export default function LightwellApp() {
             <Route path='beacon' element={<Beacon />} />
           ) : null}
           {features?.lightwelllens?.enabled && features?.lightwelllens?.accessible ? (
-            <Route path='lens' element={<CoverageAnalyzer />} />
+            <>
+              <Route path='lens' element={<ManifestUpload />} />
+              <Route path='lens/:reportUUID' element={<CoverageReport />} />
+            </>
           ) : null}
           <Route path=':repoName/:group/:packageName' element={<PackageDetails />} />
           <Route path=':repoName/:packageName' element={<PackageDetails />} />
