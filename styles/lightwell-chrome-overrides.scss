@@ -1,10 +1,14 @@
-
 // TrustArc "Cookie preferences" link is injected by Chrome and pushed off-screen,
 // causing an unwanted scrollbar. Fix it in the bottom-left corner instead.
 .truste_caIcon_display {
-    position: fixed !important;
-    bottom: 16px !important;
-    left: 16px !important;
-    z-index: 1000 !important;
-    overflow: visible !important;
+  position: fixed !important;
+  bottom: 16px !important;
+  left: 16px !important;
+  z-index: 1000 !important;
+  overflow: visible !important;
+}
+
+// Chrome breadcrumb favorites (star + caret)
+.chr-c-page--lightwell .chr-c-breadcrumbs button:has(.chr-c-breadcrumbs__favorite) {
+  display: none;
 }
