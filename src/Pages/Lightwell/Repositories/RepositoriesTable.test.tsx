@@ -362,7 +362,7 @@ it('renders java predisclosure repository', async () => {
   expect(screen.getByText('Predisclosure')).toBeInTheDocument();
 });
 
-it('does not show notification toggle for predisclosure repositories', async () => {
+it('shows notification toggle for predisclosure repositories', async () => {
   (useLightwellNotificationPrefs as jest.Mock).mockReturnValue({
     prefs: { enabled: true, minimumSeverity: 'critical' },
     isLoading: false,
@@ -382,8 +382,46 @@ it('does not show notification toggle for predisclosure repositories', async () 
   await screen.findByText('Java Predisclosure');
 
   expect(
-    screen.queryByRole('switch', {
+    screen.getByRole('switch', {
       name: `Toggle notifications for ${javaPredisclosureContentItem.name}`,
     }),
-  ).not.toBeInTheDocument();
+  ).toBeInTheDocument();
+});
+
+it('subscribes to predisclosure repository notifications when toggle is turned on', async () => {
+  const user = userEvent.setup();
+  const mockSetRepoSubscribed = jest.fn();
+  (useLightwellNotificationPrefs as jest.Mock).mockReturnValue({
+    prefs: { enabled: true, minimumSeverity: 'high' },
+    isLoading: false,
+    isError: false,
+    shouldExposeNotifications: true,
+  });
+  (useLightwellRepoNotifications as jest.Mock).mockReturnValue({
+    isRepoSubscribed: jest.fn().mockReturnValue(false),
+    setRepoSubscribed: mockSetRepoSubscribed,
+    isLoading: false,
+    isError: false,
+    pendingEventType: undefined,
+  });
+  (useContentListQuery as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    data: {
+      data: [javaPredisclosureContentItem],
+      meta: { count: 1, limit: 20, offset: 0 },
+    },
+  }));
+
+  renderRepositoriesTable();
+
+  const toggle = await screen.findByRole('switch', {
+    name: `Toggle notifications for ${javaPredisclosureContentItem.name}`,
+  });
+  expect(toggle).not.toBeChecked();
+
+  await user.click(toggle);
+  expect(mockSetRepoSubscribed).toHaveBeenCalledWith('java-predisclosure', [
+    'critical',
+    'important',
+  ]);
 });

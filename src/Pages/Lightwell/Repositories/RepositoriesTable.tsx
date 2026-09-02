@@ -345,7 +345,8 @@ const RepositoriesTable = () => {
                             </Td>
                             {showNotificationsColumn ? (
                               <Td>
-                                {security_level === 'remediated' ? (
+                                {security_level === 'remediated' ||
+                                security_level === 'predisclosure' ? (
                                   <Switch
                                     id={`notify-toggle-${uuid}`}
                                     aria-label={`Toggle notifications for ${name}`}
