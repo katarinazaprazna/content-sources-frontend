@@ -90,7 +90,10 @@ const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) =
     isError,
   });
 
-  const dataViewColumns: DataViewTh[] = COLUMNS.map((name) => ({ cell: name }));
+  const dataViewColumns: DataViewTh[] = COLUMNS.map((name, index) => ({
+    cell: name,
+    props: { width: ([40, 20, 20, 20] as const)[index] },
+  }));
   const dataViewRows: DataViewTrObject[] = packages.map((pkg: CoverageReportPackage) => {
     const { text, color } = MATCH_STATUS_LABEL[pkg.match_status];
     return {
