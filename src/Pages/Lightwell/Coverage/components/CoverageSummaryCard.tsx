@@ -1,17 +1,14 @@
 import { Content, Flex, FlexItem, Title } from '@patternfly/react-core';
 import text from '@patternfly/react-styles/css/utilities/Text/text';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { ChartDonut, ChartLabel } from '@patternfly/react-charts/victory';
 import { useMemo } from 'react';
+
+import MatchDonutChart from '../charts/MatchDonutChart';
 import {
-  COVERAGE_DONUT_HEIGHT,
-  COVERAGE_DONUT_PADDING,
-  COVERAGE_DONUT_TITLE_LINE_HEIGHT,
   COVERAGE_DONUT_WIDTH,
-  EXACT_MATCH_COLOR,
-  FUZZY_MATCH_COLOR,
-  NO_MATCH_COLOR,
-} from '../constants';
+  getMatchedPackagePercentage,
+  getMatchDonutChartHeight,
+} from '../charts/matchDonutChart';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 import { useContainerWidth } from '../../hooks/useContainerWidth';
 import MatchSummaryStats, { type MatchSummaryItem } from './MatchSummaryStats';
@@ -39,40 +36,21 @@ const getMatchSummaryItems = (report: CompletedCoverageReport): MatchSummaryItem
   },
 ];
 
-const getDonutData = (report: CompletedCoverageReport) => [
-  { x: 'Exact match', y: report.exact_matches },
-  { x: 'Partial match', y: report.partial_matches },
-  { x: 'No match', y: report.unmatched },
-];
-
 const CoverageSummaryCard = ({ report }: CoverageSummaryCardProps) => {
   const { containerRef, width: chartWidth } = useContainerWidth(COVERAGE_DONUT_WIDTH);
-  const chartHeight = Math.round((chartWidth * COVERAGE_DONUT_HEIGHT) / COVERAGE_DONUT_WIDTH);
 
-  const inNetwork = report.exact_matches + report.partial_matches;
-  const percentage = report.total > 0 ? Math.round((inNetwork / report.total) * 100) : 0;
-
+  const percentage = getMatchedPackagePercentage(report);
   const matchSummaryItems = useMemo(() => getMatchSummaryItems(report), [report]);
-  const donutData = useMemo(() => getDonutData(report), [report]);
 
   return (
     <Flex gap={{ default: 'gapXl' }} alignItems={{ default: 'alignItemsCenter' }}>
       <FlexItem style={{ width: '100%', maxWidth: COVERAGE_DONUT_WIDTH }}>
-        <div ref={containerRef} style={{ width: '100%' }}>
-          <ChartDonut
-            ariaDesc='Match summary donut chart'
-            constrainToVisibleArea
-            data={donutData}
-            colorScale={[EXACT_MATCH_COLOR, FUZZY_MATCH_COLOR, NO_MATCH_COLOR]}
-            labels={({ datum }) => `${datum.x}: ${datum.y}`}
-            title={`${percentage}%`}
-            subTitle='packages matched'
-            titleComponent={<ChartLabel lineHeight={COVERAGE_DONUT_TITLE_LINE_HEIGHT} />}
-            width={chartWidth}
-            height={chartHeight}
-            padding={COVERAGE_DONUT_PADDING}
-          />
-        </div>
+        <MatchDonutChart
+          report={report}
+          containerRef={containerRef}
+          width={chartWidth}
+          height={getMatchDonutChartHeight(chartWidth)}
+        />
       </FlexItem>
       <FlexItem flex={{ default: 'flex_1' }}>
         <Flex direction={{ default: 'column' }} gap={{ default: 'gapLg' }}>

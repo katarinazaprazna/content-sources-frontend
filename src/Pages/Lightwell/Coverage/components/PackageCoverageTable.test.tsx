@@ -10,6 +10,11 @@ jest.mock('services/Lightwell/CoverageReportsQueries', () => ({
   useCoverageReportPackagesQuery: jest.fn(),
 }));
 
+jest.mock('Pages/Lightwell/constants', () => ({
+  ...jest.requireActual('Pages/Lightwell/constants'),
+  LIGHTWELL_LENS_USE_MOCK: false,
+}));
+
 const renderTable = (ecosystems = ['Java', 'Python', 'npm']) =>
   render(
     <ReactQueryTestWrapper>

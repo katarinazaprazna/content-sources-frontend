@@ -11,16 +11,9 @@ import { useCoverageReportPackagesQuery } from 'services/Lightwell/CoverageRepor
 
 jest.mock('./hooks/useCoverageReport');
 
-// Charts are not under test here, no-op mocks keep the focus on text and button assertions
-jest.mock('@patternfly/react-charts/victory', () => ({
-  ChartDonut: () => null,
-  ChartLabel: () => null,
-  Chart: () => null,
-  ChartAxis: () => null,
-  ChartBar: () => null,
-  ChartStack: () => null,
-  ChartTooltip: () => null,
-}));
+// Charts (including the bar chart's screen-reader table) are tested in their own files
+jest.mock('./charts/EcosystemBarChart', () => ({ __esModule: true, default: () => null }));
+jest.mock('./charts/MatchDonutChart', () => ({ __esModule: true, default: () => null }));
 
 jest.mock('services/Lightwell/CoverageReportsQueries', () => ({
   ...jest.requireActual('services/Lightwell/CoverageReportsQueries'),
@@ -91,7 +84,7 @@ describe('CoverageReport', () => {
 
   it('displays ecosystem breakdown with package counts', () => {
     renderCoverageReport();
-    expect(screen.getByText('By Ecosystem')).toBeInTheDocument();
+    expect(screen.getByText('Packages by ecosystem')).toBeInTheDocument();
     const paragraphs = screen.getAllByRole('paragraph');
     expect(paragraphs.some((p) => p.textContent?.includes('75 of 100 packages'))).toBe(true);
   });

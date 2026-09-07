@@ -10,12 +10,14 @@ export type EcosystemCoverageSummary = {
   total: number;
 };
 
+export type CoverageMatchStatus = 'exact' | 'partial' | 'none';
+
 export type CoverageReportPackage = {
   name: string;
   version: string;
   ecosystem: string;
   covered: boolean;
-  match_status: 'exact' | 'partial' | 'none';
+  match_status: CoverageMatchStatus;
 };
 
 export type CoverageReportPackagesListResponse = {

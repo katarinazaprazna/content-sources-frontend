@@ -1,6 +1,7 @@
 import '@patternfly/react-catalog-view-extension/dist/css/react-catalog-view-extension.css';
 import '../styles/lightwell-chrome-overrides.scss';
 import '../styles/lightwell-clipboard-copy.scss';
+import '../styles/lightwell-coverage-charts.scss';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
