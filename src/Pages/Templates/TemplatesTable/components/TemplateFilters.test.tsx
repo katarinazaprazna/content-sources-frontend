@@ -12,7 +12,10 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
-jest.mock('@tanstack/react-query');
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: jest.fn(),
+}));
 
 beforeAll(() => {
   (useQueryClient as jest.Mock).mockImplementation(() => ({

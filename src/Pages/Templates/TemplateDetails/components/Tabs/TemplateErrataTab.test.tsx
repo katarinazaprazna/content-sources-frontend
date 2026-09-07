@@ -21,8 +21,6 @@ jest.mock('dayjs', () => (value) => ({
 
 jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
-jest.mock('@tanstack/react-query');
-
 jest.mock('services/Templates/TemplateQueries', () => ({
   useFetchTemplateErrataQuery: jest.fn(),
 }));

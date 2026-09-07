@@ -24,7 +24,10 @@ jest.mock('Hooks/useSafeUUIDParam', () => () => templateUUID);
 
 jest.mock('Hooks/useCompatibleSystems');
 
-jest.mock('@tanstack/react-query');
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
+  useQueryClient: jest.fn(),
+}));
 
 jest.mock('services/Systems/SystemsQueries', () => ({
   useListSystemsByTemplateId: jest.fn(),
