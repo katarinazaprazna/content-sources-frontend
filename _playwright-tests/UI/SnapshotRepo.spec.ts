@@ -223,7 +223,10 @@ test.describe('Snapshot Repositories', () => {
       await navigateToSnapshotsOfRepository(page, row);
 
       await expect(page.getByRole('dialog', { name: 'Snapshots' }).locator('tbody')).toBeVisible();
-      await page.getByRole('row', { name: 'select-snapshot-checkbox' }).locator('label').click();
+      await page
+        .getByRole('row', { name: 'select-snapshot-checkbox' })
+        .getByRole('checkbox')
+        .click();
       // Verify that you can't delete all snapshots
       // Bulk delete button is disabled
       await expect(page.getByTestId('remove_snapshots_bulk')).toBeDisabled();
