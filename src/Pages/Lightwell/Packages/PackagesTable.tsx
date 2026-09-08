@@ -193,6 +193,8 @@ const StackedItemsCell = <T,>({
   );
 };
 
+const DROP_LAST_CHROME_SEGMENT_OPTIONS = { dropLastChromeSegment: true };
+
 const PackagesTable = () => {
   const classes = useStyles();
 
@@ -263,7 +265,7 @@ const PackagesTable = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+    args: appBreadcrumbsEnabled ? [breadcrumbs, DROP_LAST_CHROME_SEGMENT_OPTIONS] : [[]],
   });
 
   const fetchingOrLoading = useMock ? false : isPackagesLoading || isPackagesFetching;

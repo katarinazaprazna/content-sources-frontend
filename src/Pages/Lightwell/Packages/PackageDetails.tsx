@@ -74,6 +74,8 @@ const useStyles = createUseStyles({
   },
 });
 
+const DROP_LAST_CHROME_SEGMENT_OPTIONS = { dropLastChromeSegment: true };
+
 const PackageDetails = () => {
   const classes = useStyles();
   const { navigateTo } = useLightwellNavigateTo();
@@ -133,7 +135,7 @@ const PackageDetails = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+    args: appBreadcrumbsEnabled ? [breadcrumbs, DROP_LAST_CHROME_SEGMENT_OPTIONS] : [[]],
   });
 
   const mavenVersionsListQuery = useMavenPackageVersionsListQuery(

@@ -79,6 +79,8 @@ const useStyles = createUseStyles({
   },
 });
 
+const DROP_LAST_CHROME_SEGMENT_OPTIONS = { dropLastChromeSegment: true };
+
 const RepositoriesTable = () => {
   const classes = useStyles();
   const isDemo = useLightwellDemo();
@@ -100,7 +102,7 @@ const RepositoriesTable = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+    args: appBreadcrumbsEnabled ? [breadcrumbs, DROP_LAST_CHROME_SEGMENT_OPTIONS] : [[]],
   });
 
   const useMock = LIGHTWELL_USE_MOCK;

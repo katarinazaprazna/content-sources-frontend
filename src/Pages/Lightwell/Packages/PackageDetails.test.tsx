@@ -584,6 +584,7 @@ it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
           title: `${defaultLightwellRepositoryPackageItem.group}:${packageName}`,
         },
       ],
+      { dropLastChromeSegment: true },
     ],
   });
 });

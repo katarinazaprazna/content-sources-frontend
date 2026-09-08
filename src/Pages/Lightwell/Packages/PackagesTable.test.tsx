@@ -260,6 +260,7 @@ it('registers breadcrumbs with Chrome via useRemoteHook', async () => {
           title: 'Java Validated',
         },
       ],
+      { dropLastChromeSegment: true },
     ],
   });
 });

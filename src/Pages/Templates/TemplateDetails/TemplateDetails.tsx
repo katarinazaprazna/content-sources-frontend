@@ -59,6 +59,8 @@ const useStyles = createUseStyles({
   },
 });
 
+const DROP_LAST_CHROME_SEGMENT_OPTIONS = { dropLastChromeSegment: true };
+
 export default function TemplateDetails() {
   const classes = useStyles();
   const { templateUUID } = useParams();
@@ -90,7 +92,7 @@ export default function TemplateDetails() {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+    args: appBreadcrumbsEnabled ? [breadcrumbs, DROP_LAST_CHROME_SEGMENT_OPTIONS] : [[]],
   });
 
   // Error is caught in the wrapper component

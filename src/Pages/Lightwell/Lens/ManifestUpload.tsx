@@ -8,6 +8,8 @@ import { useManifestUpload } from './hooks/useManifestUpload';
 import ManifestUploadCard from './components/ManifestUploadCard';
 import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 
+const DROP_LAST_CHROME_SEGMENT_OPTIONS = { dropLastChromeSegment: true };
+
 const ManifestUpload = () => {
   const { uploadProps } = useManifestUpload();
   const rootPath = useLightwellRootPath();
@@ -20,7 +22,7 @@ const ManifestUpload = () => {
   useRemoteHook({
     scope: 'chrome',
     module: './breadcrumbs/useReplaceBreadcrumbs',
-    args: appBreadcrumbsEnabled ? [breadcrumbs] : [[]],
+    args: appBreadcrumbsEnabled ? [breadcrumbs, DROP_LAST_CHROME_SEGMENT_OPTIONS] : [[]],
   });
 
   return (
