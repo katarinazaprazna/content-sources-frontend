@@ -3,15 +3,15 @@ import text from '@patternfly/react-styles/css/utilities/Text/text';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useMemo } from 'react';
 
-import MatchDonutChart from '../charts/MatchDonutChart';
 import {
   COVERAGE_DONUT_WIDTH,
   getMatchedPackagePercentage,
   getMatchDonutChartHeight,
-} from '../charts/matchDonutChart';
+} from '../charts/matchDonutModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 import { useContainerWidth } from '../../hooks/useContainerWidth';
 import MatchSummaryStats, { type MatchSummaryItem } from './MatchSummaryStats';
+import MatchDonutChart from '../charts/MatchDonutChart';
 
 type CoverageSummaryCardProps = {
   report: CompletedCoverageReport;

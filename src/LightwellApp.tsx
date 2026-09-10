@@ -16,8 +16,8 @@ import Beacon from 'Pages/Lightwell/Beacon/Beacon';
 import LightwellNotFound from 'Pages/Lightwell/components/LightwellNotFound';
 import { LightwellDemoLayout } from 'Pages/Lightwell/LightwellDemoContext';
 import { useAppContext } from './middleware/AppContext';
-import CoverageReport from 'Pages/Lightwell/Coverage/CoverageReport';
-import ManifestUpload from 'Pages/Lightwell/Coverage/ManifestUpload';
+import CoverageReport from 'Pages/Lightwell/Lens/CoverageReport';
+import ManifestUpload from 'Pages/Lightwell/Lens/ManifestUpload';
 
 export default function LightwellApp() {
   const pageSafe = usePageSafe();
