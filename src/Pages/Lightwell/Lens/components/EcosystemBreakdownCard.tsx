@@ -1,10 +1,10 @@
 import { Content, Flex, FlexItem, Title } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import EcosystemBarChart from '../charts/EcosystemBarChart';
-import { ECOSYSTEM_CHART_MIN_WIDTH, getEcosystemBarChartHeight } from '../charts/ecosystemBarChart';
+import { ECOSYSTEM_CHART_MIN_WIDTH, getEcosystemBarChartHeight } from '../charts/ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 import { useContainerWidth } from '../../hooks/useContainerWidth';
+import EcosystemBarChart from '../charts/EcosystemBarChart';
 
 type EcosystemBreakdownCardProps = {
   report: CompletedCoverageReport;

@@ -21,7 +21,7 @@ import {
   type EcosystemChartA11yTable,
   type EcosystemChartLegendItem,
   getEcosystemChartA11yTable,
-} from './ecosystemBarChart';
+} from './ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 
 type EcosystemBarChartBase = {

@@ -8,7 +8,7 @@ import {
   getDonutData,
   getDonutLabel,
   getMatchedPackagePercentage,
-} from './matchDonutChart';
+} from './matchDonutModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 
 type MatchDonutChartBase = {

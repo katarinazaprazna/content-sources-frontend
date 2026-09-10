@@ -1,9 +1,9 @@
 import React, { createRef } from 'react';
 import { render, screen, within } from '@testing-library/react';
 
-import EcosystemBarChart from './EcosystemBarChart';
-import { getEcosystemBarChartHeight } from './ecosystemBarChart';
+import { getEcosystemBarChartHeight } from './ecosystemBarModel';
 import { MOCK_REPORT } from '../../mockCoverageAnalysis';
+import EcosystemBarChart from './EcosystemBarChart';
 
 jest.mock('@patternfly/react-charts/victory', () => ({
   Chart: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,

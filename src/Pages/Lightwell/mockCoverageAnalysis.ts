@@ -1,5 +1,5 @@
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
-import type { ManifestUploadCardProps } from './Coverage/components/ManifestUploadCard';
+import type { ManifestUploadCardProps } from './Lens/components/ManifestUploadCard';
 
 export const MOCK_REPORT: CompletedCoverageReport = {
   uuid: 'mock-report',
