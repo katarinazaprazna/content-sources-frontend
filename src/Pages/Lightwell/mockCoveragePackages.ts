@@ -45,9 +45,7 @@ const DUMMY_PACKAGE_SEEDS: Omit<CoverageReportPackage, 'ecosystem'>[] = [
   { name: 'inquirer', version: '10.1.8', covered: true, match_status: 'exact' },
 ];
 
-export const getDummyCoveragePackages = (
-  ecosystems: string[] = ['Java', 'Python', 'npm'],
-): CoverageReportPackage[] =>
+export const getDummyCoveragePackages = (ecosystems: string[]): CoverageReportPackage[] =>
   DUMMY_PACKAGE_SEEDS.map((pkg, index) => ({
     ...pkg,
     ecosystem: ecosystems[index % ecosystems.length],

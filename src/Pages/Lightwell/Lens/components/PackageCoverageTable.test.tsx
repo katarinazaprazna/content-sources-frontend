@@ -15,7 +15,7 @@ jest.mock('Pages/Lightwell/constants', () => ({
   LIGHTWELL_LENS_USE_MOCK: false,
 }));
 
-const renderTable = (ecosystems = ['Java', 'Python', 'npm']) =>
+const renderTable = (ecosystems = ['Java', 'Python', 'JavaScript']) =>
   render(
     <ReactQueryTestWrapper>
       <PackageCoverageTable uuid='test-uuid' ecosystems={ecosystems} />
@@ -48,7 +48,7 @@ describe('PackageCoverageTable', () => {
 
     expect(screen.getByText('Java')).toBeInTheDocument();
     expect(screen.getByText('Python')).toBeInTheDocument();
-    expect(screen.getByText('npm')).toBeInTheDocument();
+    expect(screen.getByText('JavaScript')).toBeInTheDocument();
 
     expect(screen.getByText('Exact')).toBeInTheDocument();
     expect(screen.getByText('Partial')).toBeInTheDocument();

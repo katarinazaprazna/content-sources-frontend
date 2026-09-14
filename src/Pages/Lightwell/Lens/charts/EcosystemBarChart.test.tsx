@@ -31,8 +31,8 @@ describe('EcosystemBarChart', () => {
     expect(table.parentElement).toHaveClass('pf-v6-screen-reader');
     expect(within(table).getByRole('columnheader', { name: 'Exact match' })).toBeInTheDocument();
     expect(within(table).getByRole('columnheader', { name: 'Partial match' })).toBeInTheDocument();
-    expect(within(table).getByRole('row', { name: /Java/ })).toHaveTextContent('450');
-    expect(within(table).getByRole('row', { name: /Rust/ })).toHaveTextContent('30');
+    expect(within(table).getByRole('row', { name: 'Java 450 110 90' })).toBeInTheDocument();
+    expect(within(table).getByRole('row', { name: 'Rust 0 0 30' })).toBeInTheDocument();
   });
 
   it('shows the legend and Packages axis title on pdf without a table', () => {
