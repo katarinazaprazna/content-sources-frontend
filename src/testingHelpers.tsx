@@ -851,12 +851,18 @@ export const defaultCoverageReportItem: CompletedCoverageReport = {
   ecosystem_coverage_summary: [
     { ecosystem: 'Java', exact_matches: 30, partial_matches: 10, unmatched: 10, total: 50 },
     { ecosystem: 'Python', exact_matches: 20, partial_matches: 5, unmatched: 10, total: 35 },
-    { ecosystem: 'npm', exact_matches: 10, partial_matches: 0, unmatched: 5, total: 15 },
+    { ecosystem: 'JavaScript', exact_matches: 10, partial_matches: 0, unmatched: 5, total: 15 },
   ],
 };
 
 export const defaultCoverageReportPackagesItem: CoverageReportPackage[] = [
   { name: 'spring-web', version: '6.1.5', ecosystem: 'Java', covered: true, match_status: 'exact' },
   { name: 'flask', version: '3.0.3', ecosystem: 'Python', covered: true, match_status: 'partial' },
-  { name: 'lodash', version: '4.17.21', ecosystem: 'npm', covered: false, match_status: 'none' },
+  {
+    name: 'lodash',
+    version: '4.17.21',
+    ecosystem: 'JavaScript',
+    covered: false,
+    match_status: 'none',
+  },
 ];
