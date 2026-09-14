@@ -92,7 +92,8 @@ export const getCoverageReportPackages = async (
         limit: limit.toString(),
         search: filters.search,
         match_status: filters.match_status?.join(','),
-        ecosystem: filters.ecosystem?.join(','),
+        // objectToUrlParams does not escape #, so ecosystem=C# never reached the backend
+        ecosystem: filters.ecosystem?.map(encodeURIComponent).join(','),
       },
     )}`,
   );

@@ -1,7 +1,7 @@
 import { ChartDonut, ChartLabel, ChartThemeColor } from '@patternfly/react-charts/victory';
 import { useMemo, type Ref } from 'react';
 
-import { DONUT_COLOR_SCALE } from './chartColors';
+import { DONUT_COLOR_SCALE } from './chartTheme';
 import {
   COVERAGE_DONUT_PADDING,
   COVERAGE_DONUT_TITLE_LINE_HEIGHT,
