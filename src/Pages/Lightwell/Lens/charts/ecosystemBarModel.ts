@@ -1,4 +1,4 @@
-import { getEcosystemMatchColor, UNMATCHED_FILL } from './chartColors';
+import { COLOR_KEY_BY_LABEL, getEcosystemMatchColor, UNMATCHED_FILL } from './chartTheme';
 import type {
   CompletedCoverageReport,
   CoverageMatchStatus,
@@ -37,6 +37,18 @@ type EcosystemChartModel = {
   ecosystems: string[];
 };
 
+export const orderSummaries = (summaries: EcosystemCoverageSummary[]): EcosystemCoverageSummary[] =>
+  [...summaries].sort((a, b) => {
+    const aSupported = COLOR_KEY_BY_LABEL.has(a.ecosystem);
+    const bSupported = COLOR_KEY_BY_LABEL.has(b.ecosystem);
+    if (aSupported !== bSupported) return aSupported ? 1 : -1; // Unsupported first
+    if (!aSupported) return a.unmatched - b.unmatched;
+    if (a.exact_matches === 0 && b.exact_matches === 0) {
+      return a.partial_matches - b.partial_matches;
+    }
+    return a.exact_matches - b.exact_matches;
+  });
+
 const toBarSeries = (
   summaries: EcosystemCoverageSummary[],
   getCount: (eco: EcosystemCoverageSummary) => number,
@@ -49,7 +61,7 @@ const toBarSeries = (
   }));
 
 export const getEcosystemChartModel = (report: CompletedCoverageReport): EcosystemChartModel => {
-  const summaries = report.ecosystem_coverage_summary;
+  const summaries = orderSummaries(report.ecosystem_coverage_summary);
 
   return {
     exactPackages: toBarSeries(

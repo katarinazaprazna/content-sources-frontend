@@ -21,7 +21,7 @@ const getMatchSummaryItems = (report: CompletedCoverageReport): MatchSummaryItem
   {
     count: report.exact_matches,
     label: 'Exact match',
-    tooltip: 'Package name and version found in the Lightwell Network catalog.',
+    tooltip: 'Package name and version found in the catalog.',
   },
   {
     count: report.partial_matches,
@@ -32,7 +32,7 @@ const getMatchSummaryItems = (report: CompletedCoverageReport): MatchSummaryItem
     count: report.unmatched,
     label: 'No match',
     tooltip:
-      'Package not found in the Lightwell Network catalog. Unmatched packages are logged as demand signals, but do not guarantee a build.',
+      'Package not found in the catalog, or belongs to an ecosystem not yet supported. Unmatched packages are logged as demand signals, but do not guarantee a build.',
   },
 ];
 
@@ -59,7 +59,7 @@ const CoverageSummaryCard = ({ report }: CoverageSummaryCardProps) => {
               <strong>{percentage}%</strong> of packages match the Lightwell Network catalog
             </Title>
             <Content component='p' className={`${text.textColorSubtle} ${spacing.mtSm}`}>
-              Applies to packages within supported ecosystems (see below).
+              Covers supported and not-yet-supported ecosystems in your stack.
             </Content>
           </FlexItem>
           <FlexItem>
