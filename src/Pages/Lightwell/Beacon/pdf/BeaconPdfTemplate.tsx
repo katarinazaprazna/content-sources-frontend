@@ -132,6 +132,7 @@ const BeaconPdfTemplate = ({ asyncData, additionalData }: BeaconPdfTemplateProps
           white-space: nowrap;
         }
         .beacon-pdf .beacon-pdf-col-component,
+        .beacon-pdf .beacon-pdf-col-publishedVersions,
         .beacon-pdf .beacon-pdf-col-title,
         .beacon-pdf .beacon-pdf-col-cvssVector,
         .beacon-pdf .beacon-pdf-col-batch {

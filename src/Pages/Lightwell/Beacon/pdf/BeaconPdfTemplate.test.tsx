@@ -70,4 +70,35 @@ describe('BeaconPdfTemplate', () => {
     expect(screen.getByText('Vulnerabilities (continued)')).toBeInTheDocument();
     expect(screen.getByText('LWL-2026-4401')).toBeInTheDocument();
   });
+
+  it('renders published versions as a comma-separated list and is empty when none exist', () => {
+    render(
+      <BeaconPdfTemplate
+        asyncData={{
+          data: {
+            vulnerabilities: [
+              mockVulnerabilities[4],
+              { ...mockVulnerabilities[0], publishedVersions: [] },
+            ],
+            meta,
+          },
+        }}
+        additionalData={{
+          customerId: 'CID-214',
+          generatedAt: '25 Aug 2026',
+          includeSummary: false,
+          visibleColumns: [
+            { key: 'vulnerabilityId', title: 'Vulnerability ID' },
+            { key: 'publishedVersions', title: 'Published Versions' },
+          ],
+        }}
+      />,
+    );
+
+    const publishedRow = screen.getByText('LWL-2026-4001').closest('tr');
+    expect(publishedRow).toHaveTextContent('1.10.1.rhlw-00002, 1.10.0.rhlw-00001');
+
+    const emptyRow = screen.getByText('LWL-2026-4401').closest('tr');
+    expect(emptyRow?.querySelector('[data-label="Published Versions"]')).toHaveTextContent('');
+  });
 });

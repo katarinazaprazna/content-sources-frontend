@@ -31,6 +31,7 @@ const COLUMN_PDF_WIDTH: Record<string, number> = {
   component: 22,
   lastUpdated: 16,
   status: 16,
+  publishedVersions: 22,
   severity: 10,
   cvss: 6,
   cvssVector: 28,

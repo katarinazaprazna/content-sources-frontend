@@ -19,6 +19,7 @@ const collection = {
       component_name: 'log4j-core',
       package: 'log4j-core',
       component_version: '2.17.1',
+      published_versions: ['1.10.0.rhlw-00001'],
       title: 'JNDI injection',
       cwe: 'CWE-917',
       description: 'RCE',
@@ -66,6 +67,7 @@ describe('fetchData', () => {
       },
     });
     expect(result.vulnerabilities[0].vulnerabilityId).toBe('LWL-2026-4401');
+    expect(result.vulnerabilities[0].publishedVersions).toEqual(['1.10.0.rhlw-00001']);
     expect(result.meta).toEqual({
       count: 1,
       criticalCount: 1,
