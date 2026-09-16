@@ -47,6 +47,7 @@ export type LightwellVulnerabilityResponse = {
   component_name: string;
   package: string;
   component_version: string;
+  published_versions: string[];
   title?: string;
   cwe?: string;
   description?: string;
@@ -112,6 +113,7 @@ export function mapLightwellVulnerability(
     purl: vulnerability.purl ?? '',
     componentName: vulnerability.component_name,
     componentVersion: vulnerability.component_version,
+    publishedVersions: vulnerability.published_versions ?? [],
     title: vulnerability.title ?? '',
     cwe: vulnerability.cwe ?? '',
     description: vulnerability.description ?? '',

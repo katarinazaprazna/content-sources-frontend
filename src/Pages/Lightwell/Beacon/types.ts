@@ -17,6 +17,7 @@ export interface Vulnerability {
   purl: string;
   componentName: string;
   componentVersion: string;
+  publishedVersions: string[];
   title: string;
   cwe: string;
   description: string;
