@@ -1,8 +1,14 @@
 import { chart_color_purple_100 } from '@patternfly/react-tokens/dist/esm/chart_color_purple_100';
 import { chart_color_purple_300 } from '@patternfly/react-tokens/dist/esm/chart_color_purple_300';
+import { chart_donut_label_subtitle_Fill } from '@patternfly/react-tokens/dist/esm/chart_donut_label_subtitle_Fill';
+import { chart_donut_label_title_Fill } from '@patternfly/react-tokens/dist/esm/chart_donut_label_title_Fill';
+import { chart_global_FontSize_2xl } from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_2xl';
+import { chart_global_FontSize_sm } from '@patternfly/react-tokens/dist/esm/chart_global_FontSize_sm';
 import { t_global_border_color_nonstatus_gray_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_gray_default';
 import { t_global_border_color_nonstatus_green_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_green_default';
 import { t_global_border_color_nonstatus_yellow_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_yellow_default';
+import { t_global_font_weight_body_default } from '@patternfly/react-tokens/dist/esm/t_global_font_weight_body_default';
+import type { CSSProperties } from 'react';
 
 import type { CoverageMatchStatus } from 'services/Lightwell/CoverageReportsApi';
 
@@ -39,7 +45,21 @@ export const DONUT_COLOR_SCALE = [
   MATCH_STATUS_COLORS.none,
 ];
 
-const FALLBACK_SHADES = {
+export const DONUT_TITLE_AND_SUBTITLE_STYLE: CSSProperties[] = [
+  {
+    fill: chart_donut_label_title_Fill.var,
+    fontSize: chart_global_FontSize_2xl.value,
+    fontWeight: t_global_font_weight_body_default.var,
+  },
+  {
+    fill: chart_donut_label_subtitle_Fill.var,
+    fontSize: chart_global_FontSize_sm.value,
+  },
+];
+
+// Applied to unknown ecosystems (no backend mapping):
+// https://github.com/content-services/content-sources-backend/blob/fea90711c14c715cae6ad9b13cfb397e3d2807a2/pkg/coverage/parser/parser.go#L11
+const ECOSYSTEM_BAR_FALLBACK_COLORS = {
   exact: chart_color_purple_300.var,
   partial: chart_color_purple_100.var,
 };
@@ -49,6 +69,6 @@ export const getEcosystemMatchColor = (
   matchStatus: Exclude<CoverageMatchStatus, 'none'>,
 ): string => {
   const key = COLOR_KEY_BY_LABEL.get(ecosystem);
-  if (!key) return FALLBACK_SHADES[matchStatus];
+  if (!key) return ECOSYSTEM_BAR_FALLBACK_COLORS[matchStatus];
   return `var(--lw-color-${key}-${matchStatus})`;
 };

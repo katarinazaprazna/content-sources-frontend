@@ -1,7 +1,7 @@
 import { ChartDonut, ChartLabel } from '@patternfly/react-charts/victory';
 import { useMemo, type Ref } from 'react';
 
-import { DONUT_COLOR_SCALE } from './chartTheme';
+import { DONUT_TITLE_AND_SUBTITLE_STYLE, DONUT_COLOR_SCALE } from './chartTheme';
 import {
   COVERAGE_DONUT_PADDING,
   COVERAGE_DONUT_TITLE_LINE_HEIGHT,
@@ -47,7 +47,12 @@ const MatchDonutChart = (props: MatchDonutChartProps) => {
       labels={showTooltips ? getDonutLabel : undefined}
       title={`${percentage}%`}
       subTitle='packages matched'
-      titleComponent={<ChartLabel lineHeight={COVERAGE_DONUT_TITLE_LINE_HEIGHT} />}
+      titleComponent={
+        <ChartLabel
+          lineHeight={COVERAGE_DONUT_TITLE_LINE_HEIGHT}
+          style={DONUT_TITLE_AND_SUBTITLE_STYLE}
+        />
+      }
       width={width}
       height={height}
       padding={COVERAGE_DONUT_PADDING}

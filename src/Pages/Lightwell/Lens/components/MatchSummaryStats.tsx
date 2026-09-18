@@ -33,18 +33,26 @@ const MatchSummaryStats = ({ items }: MatchSummaryStatsProps) => (
             <Flex
               direction={{ default: 'column' }}
               alignItems={{ default: 'alignItemsCenter' }}
-              gap={{ default: 'gapXs' }}
+              gap={{ default: 'gapSm' }}
             >
               <FlexItem>
-                <Title headingLevel='h4' size='3xl'>
-                  {count}
-                </Title>
+                <Flex
+                  direction={{ default: 'column' }}
+                  alignItems={{ default: 'alignItemsCenter' }}
+                  gap={{ default: 'gapXs' }}
+                >
+                  <FlexItem>
+                    <Title headingLevel='h4' size='3xl'>
+                      {count}
+                    </Title>
+                  </FlexItem>
+                  <FlexItem>
+                    <span aria-hidden='true' style={getMatchLegendBarStyle(color)} />
+                  </FlexItem>
+                </Flex>
               </FlexItem>
               <FlexItem>
-                <span aria-hidden='true' style={getMatchLegendBarStyle(color)} />
-              </FlexItem>
-              <FlexItem>
-                <Content component='p' className={text.fontSizeMd}>
+                <Content component='p' className={text.fontSizeSm}>
                   {label}{' '}
                   <Tooltip content={tooltip} position='bottom'>
                     <OutlinedQuestionCircleIcon className={text.textColorSubtle} />
