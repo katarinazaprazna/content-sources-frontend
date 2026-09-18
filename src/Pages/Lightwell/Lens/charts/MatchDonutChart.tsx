@@ -1,4 +1,4 @@
-import { ChartDonut, ChartLabel, ChartThemeColor } from '@patternfly/react-charts/victory';
+import { ChartDonut, ChartLabel } from '@patternfly/react-charts/victory';
 import { useMemo, type Ref } from 'react';
 
 import { DONUT_COLOR_SCALE } from './chartTheme';
@@ -43,7 +43,6 @@ const MatchDonutChart = (props: MatchDonutChartProps) => {
       constrainToVisibleArea
       data={donutData}
       colorScale={DONUT_COLOR_SCALE}
-      themeColor={ChartThemeColor.green}
       allowTooltip={showTooltips}
       labels={showTooltips ? getDonutLabel : undefined}
       title={`${percentage}%`}
