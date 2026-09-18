@@ -1,6 +1,5 @@
 import { chart_color_purple_100 } from '@patternfly/react-tokens/dist/esm/chart_color_purple_100';
 import { chart_color_purple_300 } from '@patternfly/react-tokens/dist/esm/chart_color_purple_300';
-import { chart_skeleton_ColorScale_400 } from '@patternfly/react-tokens/dist/esm/chart_skeleton_ColorScale_400';
 import { t_global_border_color_nonstatus_gray_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_gray_default';
 import { t_global_border_color_nonstatus_green_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_green_default';
 import { t_global_border_color_nonstatus_yellow_default } from '@patternfly/react-tokens/dist/esm/t_global_border_color_nonstatus_yellow_default';
@@ -22,8 +21,6 @@ export const COLOR_KEY_BY_LABEL = new Map<string, SupportedEcosystemKey>(
   ]),
 );
 
-export const UNMATCHED_FILL = chart_skeleton_ColorScale_400.var;
-
 // Label chip family (nonstatus). Border tokens read stronger in light; match fills in dark.
 // Partial is yellow (not orange) so it does not collide with Java brand bars.
 export const MATCH_STATUS_COLORS = {
@@ -31,6 +28,8 @@ export const MATCH_STATUS_COLORS = {
   partial: t_global_border_color_nonstatus_yellow_default.var,
   none: t_global_border_color_nonstatus_gray_default.var,
 } as const;
+
+export const UNMATCHED_FILL = MATCH_STATUS_COLORS.none;
 
 export type MatchStatusColorKey = keyof typeof MATCH_STATUS_COLORS;
 
