@@ -22,17 +22,20 @@ const getMatchSummaryItems = (report: CompletedCoverageReport): MatchSummaryItem
     count: report.exact_matches,
     label: 'Exact match',
     tooltip: 'Package name and version found in the catalog.',
+    color: 'exact',
   },
   {
     count: report.partial_matches,
     label: 'Partial match',
     tooltip: 'Package name found in the catalog, but not the specific version you are running.',
+    color: 'partial',
   },
   {
     count: report.unmatched,
     label: 'No match',
     tooltip:
       'Package not found in the catalog, or belongs to an ecosystem not yet supported. Unmatched packages are logged as demand signals, but do not guarantee a build.',
+    color: 'none',
   },
 ];
 

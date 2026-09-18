@@ -32,6 +32,8 @@ export const MATCH_STATUS_COLORS = {
   none: t_global_border_color_nonstatus_gray_default.var,
 } as const;
 
+export type MatchStatusColorKey = keyof typeof MATCH_STATUS_COLORS;
+
 export const DONUT_COLOR_SCALE = [
   MATCH_STATUS_COLORS.exact,
   MATCH_STATUS_COLORS.partial,
