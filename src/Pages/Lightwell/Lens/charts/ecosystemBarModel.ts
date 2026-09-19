@@ -1,4 +1,4 @@
-import { COLOR_KEY_BY_LABEL, getEcosystemMatchColor, UNMATCHED_FILL } from './chartTheme';
+import { getEcosystemMatchColor, UNMATCHED_FILL } from './chartTheme';
 import type {
   CompletedCoverageReport,
   CoverageMatchStatus,
@@ -22,11 +22,12 @@ export type EcosystemBarDatum = {
   x: string;
   y: number;
   fill: string;
+  supported: boolean;
 };
 
 export type EcosystemChartLegendItem = {
   id: CoverageMatchStatus;
-  name: string;
+  label: string;
   fills: string[];
 };
 
@@ -34,20 +35,22 @@ type EcosystemChartModel = {
   exactPackages: EcosystemBarDatum[];
   partialPackages: EcosystemBarDatum[];
   unmatchedPackages: EcosystemBarDatum[];
-  ecosystems: string[];
 };
 
 export const orderSummaries = (summaries: EcosystemCoverageSummary[]): EcosystemCoverageSummary[] =>
   [...summaries].sort((a, b) => {
-    const aSupported = COLOR_KEY_BY_LABEL.has(a.ecosystem);
-    const bSupported = COLOR_KEY_BY_LABEL.has(b.ecosystem);
-    if (aSupported !== bSupported) return aSupported ? 1 : -1; // Unsupported first
-    if (!aSupported) return a.unmatched - b.unmatched;
+    if (a.supported !== b.supported) return a.supported ? 1 : -1; // Unsupported first
+    if (!a.supported) return a.unmatched - b.unmatched; // Compare on the unmatched field for unsupported ecosystems
     if (a.exact_matches === 0 && b.exact_matches === 0) {
       return a.partial_matches - b.partial_matches;
     }
     return a.exact_matches - b.exact_matches;
   });
+
+const getSeriesFill =
+  (matchStatus: Exclude<CoverageMatchStatus, 'none'>) =>
+  (eco: EcosystemCoverageSummary): string =>
+    eco.supported ? getEcosystemMatchColor(eco.ecosystem, matchStatus) : UNMATCHED_FILL;
 
 const toBarSeries = (
   summaries: EcosystemCoverageSummary[],
@@ -58,48 +61,43 @@ const toBarSeries = (
     x: eco.ecosystem,
     y: getCount(eco),
     fill: getFill(eco),
+    supported: eco.supported,
   }));
 
 export const getEcosystemChartModel = (report: CompletedCoverageReport): EcosystemChartModel => {
   const summaries = orderSummaries(report.ecosystem_coverage_summary);
 
   return {
-    exactPackages: toBarSeries(
-      summaries,
-      (eco) => eco.exact_matches,
-      (eco) => getEcosystemMatchColor(eco.ecosystem, 'exact'),
-    ),
-    partialPackages: toBarSeries(
-      summaries,
-      (eco) => eco.partial_matches,
-      (eco) => getEcosystemMatchColor(eco.ecosystem, 'partial'),
-    ),
+    exactPackages: toBarSeries(summaries, (eco) => eco.exact_matches, getSeriesFill('exact')),
+    partialPackages: toBarSeries(summaries, (eco) => eco.partial_matches, getSeriesFill('partial')),
     unmatchedPackages: toBarSeries(
       summaries,
       (eco) => eco.unmatched,
       () => UNMATCHED_FILL,
     ),
-    ecosystems: summaries.map((eco) => eco.ecosystem),
   };
 };
 
 export const formatIntegerTicks = (tick: number): string =>
   Number.isInteger(tick) ? tick.toString() : '';
 
-export const getLegendItems = (ecosystems: string[]): EcosystemChartLegendItem[] => [
+export const formatEcosystemName = (name: string, supported: boolean): string =>
+  supported ? name : `${name} (unsupported)`;
+
+export const getLegendItems = (model: EcosystemChartModel): EcosystemChartLegendItem[] => [
   {
     id: 'exact',
-    name: 'Exact match',
-    fills: ecosystems.map((ecosystem) => getEcosystemMatchColor(ecosystem, 'exact')),
+    label: 'Exact match',
+    fills: model.exactPackages.map((bar) => bar.fill),
   },
   {
     id: 'partial',
-    name: 'Partial match',
-    fills: ecosystems.map((ecosystem) => getEcosystemMatchColor(ecosystem, 'partial')),
+    label: 'Partial match',
+    fills: model.partialPackages.map((bar) => bar.fill),
   },
   {
     id: 'none',
-    name: 'No match',
+    label: 'No match',
     fills: [UNMATCHED_FILL],
   },
 ];
@@ -110,7 +108,7 @@ export type EcosystemChartA11yTable = {
 };
 
 export const getEcosystemChartA11yTable = (model: EcosystemChartModel): EcosystemChartA11yTable => {
-  const legendItems = getLegendItems(model.ecosystems);
+  const legendItems = getLegendItems(model);
 
   const seriesByLegendId = {
     exact: model.exactPackages,
@@ -119,9 +117,9 @@ export const getEcosystemChartA11yTable = (model: EcosystemChartModel): Ecosyste
   };
 
   return {
-    columns: legendItems.map((item) => item.name),
-    rows: model.ecosystems.map((ecosystem, index) => ({
-      ecosystem,
+    columns: legendItems.map((item) => item.label),
+    rows: model.exactPackages.map((bar, index) => ({
+      ecosystem: formatEcosystemName(bar.x, bar.supported),
       values: legendItems.map((item) => seriesByLegendId[item.id][index].y),
     })),
   };

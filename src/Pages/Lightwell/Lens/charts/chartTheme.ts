@@ -13,18 +13,15 @@ import type { CSSProperties } from 'react';
 import type { CoverageMatchStatus } from 'services/Lightwell/CoverageReportsApi';
 
 // Keys must match `$lw-ecosystem-colors` in styles/lightwell-coverage-charts.scss
-export const SUPPORTED_ECOSYSTEMS = {
+export const ECOSYSTEM_BRAND_KEYS = {
   java: { label: 'Java' },
   python: { label: 'Python' },
 } as const;
 
-export type SupportedEcosystemKey = keyof typeof SUPPORTED_ECOSYSTEMS;
+export type EcosystemBrandKey = keyof typeof ECOSYSTEM_BRAND_KEYS;
 
-export const COLOR_KEY_BY_LABEL = new Map<string, SupportedEcosystemKey>(
-  Object.entries(SUPPORTED_ECOSYSTEMS).map(([key, { label }]) => [
-    label,
-    key as SupportedEcosystemKey,
-  ]),
+export const BRAND_KEY_BY_LABEL = new Map<string, EcosystemBrandKey>(
+  Object.entries(ECOSYSTEM_BRAND_KEYS).map(([key, { label }]) => [label, key as EcosystemBrandKey]),
 );
 
 // Label chip family (nonstatus). Border tokens read stronger in light; match fills in dark.
@@ -57,7 +54,7 @@ export const DONUT_TITLE_AND_SUBTITLE_STYLE: CSSProperties[] = [
   },
 ];
 
-// Applied to unknown ecosystems (no backend mapping):
+// Applied to supported ecosystems with no brand token in ECOSYSTEM_BRAND_KEYS:
 // https://github.com/content-services/content-sources-backend/blob/fea90711c14c715cae6ad9b13cfb397e3d2807a2/pkg/coverage/parser/parser.go#L11
 const ECOSYSTEM_BAR_FALLBACK_COLORS = {
   exact: chart_color_purple_300.var,
@@ -68,7 +65,7 @@ export const getEcosystemMatchColor = (
   ecosystem: string,
   matchStatus: Exclude<CoverageMatchStatus, 'none'>,
 ): string => {
-  const key = COLOR_KEY_BY_LABEL.get(ecosystem);
+  const key = BRAND_KEY_BY_LABEL.get(ecosystem);
   if (!key) return ECOSYSTEM_BAR_FALLBACK_COLORS[matchStatus];
   return `var(--lw-color-${key}-${matchStatus})`;
 };
