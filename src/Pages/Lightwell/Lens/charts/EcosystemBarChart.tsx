@@ -14,6 +14,7 @@ import {
   COUNT_AXIS_STYLE,
   ECOSYSTEM_CHART_DOMAIN_PADDING,
   ECOSYSTEM_CHART_PADDING,
+  formatEcosystemName,
   formatIntegerTicks,
   getEcosystemChartModel,
   getLegendItems,
@@ -54,7 +55,7 @@ const getBarTooltipProps = (kind: string, showTooltips: boolean) => {
   return {
     labelComponent: <ChartTooltip constrainToVisibleArea />,
     labels: ({ datum }: { datum: EcosystemBarDatum }) =>
-      datum.y > 0 ? `${datum.x} ${kind}: ${datum.y}` : null,
+      datum.y > 0 ? `${formatEcosystemName(datum.x, datum.supported)} ${kind}: ${datum.y}` : null,
   };
 };
 
@@ -71,16 +72,16 @@ type ChartLegendProps = {
 
 const ChartLegend = ({ items }: ChartLegendProps) => (
   <Flex direction={{ default: 'column' }} gap={{ default: 'gapMd' }}>
-    {items.map(({ name, fills }) => (
-      <FlexItem key={name}>
+    {items.map(({ label, fills }) => (
+      <FlexItem key={label}>
         <Flex direction={{ default: 'column' }} gap={{ default: 'gapXs' }}>
           <FlexItem>
-            <Content component='p'>{name}</Content>
+            <Content component='p'>{label}</Content>
           </FlexItem>
           <FlexItem>
             <Flex gap={{ default: 'gapXs' }}>
               {fills.map((fill, index) => (
-                <FlexItem key={`${name}-${index}`}>
+                <FlexItem key={`${label}-${index}`}>
                   <span style={getLegendSwatchStyle(fill)} />
                 </FlexItem>
               ))}
@@ -130,7 +131,7 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
   const containerRef = isPdf ? undefined : props.containerRef;
 
   const model = useMemo(() => getEcosystemChartModel(report), [report]);
-  const { exactPackages, partialPackages, unmatchedPackages, ecosystems } = model;
+  const { exactPackages, partialPackages, unmatchedPackages } = model;
 
   const plot = (
     <div ref={containerRef} aria-hidden style={isPdf ? undefined : { width: '100%' }}>
@@ -188,7 +189,7 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
         {plot}
       </FlexItem>
       <FlexItem>
-        <ChartLegend items={getLegendItems(ecosystems)} />
+        <ChartLegend items={getLegendItems(model)} />
       </FlexItem>
     </Flex>
   );
