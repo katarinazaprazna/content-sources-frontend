@@ -23,8 +23,7 @@ const EcosystemBreakdownCard = ({ report }: EcosystemBreakdownCardProps) => {
       <Flex direction={{ default: 'column' }} gap={{ default: 'gapMd' }}>
         <FlexItem>
           <Content component='p'>
-            <strong>{inCatalog}</strong> of <strong>{report.total}</strong> packages in supported
-            ecosystems match the Lightwell Network catalog.
+            <strong>{inCatalog}</strong> of <strong>{report.total}</strong> packages found in the Lightwell Network catalog.
           </Content>
         </FlexItem>
         <FlexItem>
