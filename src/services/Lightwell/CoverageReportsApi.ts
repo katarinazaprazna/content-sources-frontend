@@ -4,6 +4,7 @@ import type { Links, Meta } from './types';
 
 export type EcosystemCoverageSummary = {
   ecosystem: string;
+  supported: boolean;
   exact_matches: number;
   partial_matches: number;
   unmatched: number;

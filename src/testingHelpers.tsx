@@ -849,9 +849,30 @@ export const defaultCoverageReportItem: CompletedCoverageReport = {
   total: 100,
   completed_at: '2026-08-18T12:01:00Z',
   ecosystem_coverage_summary: [
-    { ecosystem: 'Java', exact_matches: 30, partial_matches: 10, unmatched: 10, total: 50 },
-    { ecosystem: 'Python', exact_matches: 20, partial_matches: 5, unmatched: 10, total: 35 },
-    { ecosystem: 'JavaScript', exact_matches: 10, partial_matches: 0, unmatched: 5, total: 15 },
+    {
+      ecosystem: 'Java',
+      supported: true,
+      exact_matches: 30,
+      partial_matches: 10,
+      unmatched: 10,
+      total: 50,
+    },
+    {
+      ecosystem: 'Python',
+      supported: true,
+      exact_matches: 20,
+      partial_matches: 5,
+      unmatched: 10,
+      total: 35,
+    },
+    {
+      ecosystem: 'JavaScript',
+      supported: false,
+      exact_matches: 0,
+      partial_matches: 0,
+      unmatched: 15,
+      total: 15,
+    },
   ],
 };
 
