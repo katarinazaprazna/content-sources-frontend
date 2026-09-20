@@ -28,4 +28,5 @@ export const getDonutData = (report: CompletedCoverageReport): DonutDatum[] => [
   { x: 'No match', y: report.unmatched },
 ];
 
-export const getDonutLabel = ({ datum }: { datum: DonutDatum }): string => `${datum.x}: ${datum.y}`;
+export const getDonutLabel = ({ datum }: { datum: DonutDatum }): string =>
+  `${datum.x}: ${datum.y} packages`;

@@ -33,7 +33,7 @@ describe('EcosystemBarChart', () => {
     expect(within(table).getByRole('columnheader', { name: 'Partial match' })).toBeInTheDocument();
     expect(within(table).getByRole('row', { name: 'Java 450 110 90' })).toBeInTheDocument();
     expect(
-      within(table).getByRole('row', { name: 'Rust (unsupported) 0 0 30' }),
+      within(table).getByRole('row', { name: 'Rust (Unsupported) 0 0 30' }),
     ).toBeInTheDocument();
   });
 

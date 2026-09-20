@@ -4,4 +4,4 @@ export type EcosystemInfo = {
 };
 
 export const formatEcosystemName = (name: string, supported: boolean): string =>
-  supported ? name : `${name} (unsupported)`;
+  supported ? name : `${name} (Unsupported)`;
