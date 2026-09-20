@@ -5,8 +5,6 @@ import {
   Button,
   Card,
   CardBody,
-  Flex,
-  FlexItem,
   PageSection,
   Stack,
   StackItem,
@@ -92,14 +90,9 @@ const CoverageReport = () => {
           <StackItem>
             <Card isGlass>
               <CardBody>
-                <Flex direction={{ default: 'column' }} gap={{ default: 'gapMd' }}>
-                  <FlexItem>
-                    <RemediatedDataWarning />
-                  </FlexItem>
-                  <FlexItem>
-                    <PackageCoverageTable uuid={report.uuid} ecosystems={ecosystems} />
-                  </FlexItem>
-                </Flex>
+                {/* Remove Flex because it interacts with DataView's 100%-height and creates extra space below pagination */}
+                <RemediatedDataWarning className={spacing.mbMd} />
+                <PackageCoverageTable uuid={report.uuid} ecosystems={ecosystems} />
               </CardBody>
             </Card>
           </StackItem>
