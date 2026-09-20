@@ -1,7 +1,8 @@
 import { Content, Flex, FlexItem, Title } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import { ECOSYSTEM_CHART_MIN_WIDTH, getEcosystemBarChartHeight } from '../charts/ecosystemBarModel';
+import { ECOSYSTEM_CHART_MIN_WIDTH } from '../charts/chartTheme';
+import { getEcosystemBarChartHeight } from '../charts/ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 import { useContainerWidth } from '../../hooks/useContainerWidth';
 import EcosystemBarChart from '../charts/EcosystemBarChart';
@@ -23,7 +24,8 @@ const EcosystemBreakdownCard = ({ report }: EcosystemBreakdownCardProps) => {
       <Flex direction={{ default: 'column' }} gap={{ default: 'gapMd' }}>
         <FlexItem>
           <Content component='p'>
-            <strong>{inCatalog}</strong> of <strong>{report.total}</strong> packages found in the Lightwell Network catalog.
+            <strong>{inCatalog}</strong> of <strong>{report.total}</strong> packages found in the
+            Lightwell Network catalog.
           </Content>
         </FlexItem>
         <FlexItem>

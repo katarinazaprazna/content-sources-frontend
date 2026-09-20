@@ -12,17 +12,7 @@ import type { CSSProperties } from 'react';
 
 import type { CoverageMatchStatus } from 'services/Lightwell/CoverageReportsApi';
 
-// Keys must match `$lw-ecosystem-colors` in styles/lightwell-coverage-charts.scss
-export const ECOSYSTEM_BRAND_KEYS = {
-  java: { label: 'Java' },
-  python: { label: 'Python' },
-} as const;
-
-export type EcosystemBrandKey = keyof typeof ECOSYSTEM_BRAND_KEYS;
-
-export const BRAND_KEY_BY_LABEL = new Map<string, EcosystemBrandKey>(
-  Object.entries(ECOSYSTEM_BRAND_KEYS).map(([key, { label }]) => [label, key as EcosystemBrandKey]),
-);
+// Shared
 
 // Label chip family (nonstatus). Border tokens read stronger in light; match fills in dark.
 // Partial is yellow (not orange) so it does not collide with Java brand bars.
@@ -35,6 +25,49 @@ export const MATCH_STATUS_COLORS = {
 export const UNMATCHED_FILL = MATCH_STATUS_COLORS.none;
 
 export type MatchStatusColorKey = keyof typeof MATCH_STATUS_COLORS;
+
+// Bar chart
+
+// Keys must match `$lw-ecosystem-colors` in styles/lightwell-coverage-charts.scss
+export const ECOSYSTEM_BRAND_KEYS = {
+  java: { label: 'Java' },
+  python: { label: 'Python' },
+} as const;
+
+export type EcosystemBrandKey = keyof typeof ECOSYSTEM_BRAND_KEYS;
+
+export const BRAND_KEY_BY_LABEL = new Map<string, EcosystemBrandKey>(
+  Object.entries(ECOSYSTEM_BRAND_KEYS).map(([key, { label }]) => [label, key as EcosystemBrandKey]),
+);
+
+export const ECOSYSTEM_BAR_LEGEND_SWATCH_SIZE = 12;
+export const ECOSYSTEM_CHART_MIN_WIDTH = 500;
+export const ECOSYSTEM_CHART_PADDING = { bottom: 65, left: 100, right: 20, top: 10 };
+export const ECOSYSTEM_CHART_DOMAIN_PADDING = { x: [15, 15] as [number, number] };
+
+export const CATEGORY_AXIS_STYLE = { tickLabels: { fontSize: 14 } };
+export const COUNT_AXIS_STYLE = {
+  tickLabels: { fontSize: 14 },
+  axisLabel: { fontSize: 14, padding: 50 },
+};
+
+// Applied to unknown ecosystems with no backend mapping (no token is defined for them in ECOSYSTEM_BRAND_KEYS):
+// https://github.com/content-services/content-sources-backend/blob/fea90711c14c715cae6ad9b13cfb397e3d2807a2/pkg/coverage/parser/parser.go#L11
+const ECOSYSTEM_BAR_FALLBACK_COLORS = {
+  exact: chart_color_purple_300.var,
+  partial: chart_color_purple_100.var,
+};
+
+export const getEcosystemMatchColor = (
+  ecosystem: string,
+  matchStatus: Exclude<CoverageMatchStatus, 'none'>,
+): string => {
+  const key = BRAND_KEY_BY_LABEL.get(ecosystem);
+  if (!key) return ECOSYSTEM_BAR_FALLBACK_COLORS[matchStatus];
+  return `var(--lw-color-${key}-${matchStatus})`;
+};
+
+// Donut chart
 
 export const DONUT_COLOR_SCALE = [
   MATCH_STATUS_COLORS.exact,
@@ -53,19 +86,3 @@ export const DONUT_TITLE_AND_SUBTITLE_STYLE: CSSProperties[] = [
     fontSize: chart_global_FontSize_sm.value,
   },
 ];
-
-// Applied to supported ecosystems with no brand token in ECOSYSTEM_BRAND_KEYS:
-// https://github.com/content-services/content-sources-backend/blob/fea90711c14c715cae6ad9b13cfb397e3d2807a2/pkg/coverage/parser/parser.go#L11
-const ECOSYSTEM_BAR_FALLBACK_COLORS = {
-  exact: chart_color_purple_300.var,
-  partial: chart_color_purple_100.var,
-};
-
-export const getEcosystemMatchColor = (
-  ecosystem: string,
-  matchStatus: Exclude<CoverageMatchStatus, 'none'>,
-): string => {
-  const key = BRAND_KEY_BY_LABEL.get(ecosystem);
-  if (!key) return ECOSYSTEM_BAR_FALLBACK_COLORS[matchStatus];
-  return `var(--lw-color-${key}-${matchStatus})`;
-};
