@@ -4,6 +4,7 @@ import type {
   CoverageMatchStatus,
   EcosystemCoverageSummary,
 } from 'services/Lightwell/CoverageReportsApi';
+import { formatEcosystemName } from '../utils/ecosystem';
 
 export const getEcosystemBarChartHeight = (ecosystemCount: number): number =>
   75 + ecosystemCount * 55;
@@ -70,9 +71,6 @@ export const getEcosystemChartModel = (report: CompletedCoverageReport): Ecosyst
 
 export const formatIntegerTicks = (tick: number): string =>
   Number.isInteger(tick) ? tick.toString() : '';
-
-export const formatEcosystemName = (name: string, supported: boolean): string =>
-  supported ? name : `${name} (unsupported)`;
 
 export const getLegendItems = (model: EcosystemChartModel): EcosystemChartLegendItem[] => [
   {

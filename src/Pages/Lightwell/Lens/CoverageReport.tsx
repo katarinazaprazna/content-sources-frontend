@@ -22,13 +22,18 @@ import RemediatedDataWarning from '../RemediatedDataWarning';
 import { useCoverageReport } from './hooks/useCoverageReport';
 import Loader from 'components/Loader';
 import LightwellNotFound from '../components/LightwellNotFound';
+import type { EcosystemInfo } from './utils/ecosystem';
 
 const CoverageReport = () => {
   const { reportUUID } = useParams();
   const { filename, report, isLoading, isError, error, startOver } = useCoverageReport(reportUUID);
 
-  const ecosystems = useMemo(
-    () => report?.ecosystem_coverage_summary.map((summary) => summary.ecosystem) ?? [],
+  const ecosystems: EcosystemInfo[] = useMemo(
+    () =>
+      report?.ecosystem_coverage_summary.map(({ ecosystem, supported }) => ({
+        name: ecosystem,
+        supported,
+      })) ?? [],
     [report],
   );
 
