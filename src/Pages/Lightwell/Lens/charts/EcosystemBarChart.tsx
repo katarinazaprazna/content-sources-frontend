@@ -17,7 +17,6 @@ import {
   ECOSYSTEM_CHART_PADDING,
 } from './chartTheme';
 import {
-  formatEcosystemName,
   formatIntegerTicks,
   getEcosystemChartModel,
   getLegendItems,
@@ -27,6 +26,7 @@ import {
   getEcosystemChartA11yTable,
 } from './ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
+import { formatEcosystemName } from '../utils/ecosystem';
 
 type EcosystemBarChartBase = {
   report: CompletedCoverageReport;

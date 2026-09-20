@@ -50,15 +50,3 @@ $lw-partial-dark-mode-percent: 77%;
     --lw-color-#{$name}-partial: var(--lw-color-#{$name}-partial-dark-mode);
   }
 }
-
-// Lighten yellow in light mode so it matches the other soft-colored labels.
-// `.pf-m-yellow` resets --BackgroundColor, so override the yellow fill var.
-:root:not(.pf-v6-theme-dark) .pf-v6-c-label.pf-m-yellow.lightwell-match-label-partial {
-  --lw-partial-label-fill: color-mix(
-    in srgb,
-    var(--pf-t--global--color--nonstatus--yellow--default) 65%,
-    var(--pf-t--color--white)
-  );
-  --pf-v6-c-label--m-yellow--BackgroundColor: var(--lw-partial-label-fill);
-  --pf-v6-c-label--BackgroundColor: var(--lw-partial-label-fill);
-}

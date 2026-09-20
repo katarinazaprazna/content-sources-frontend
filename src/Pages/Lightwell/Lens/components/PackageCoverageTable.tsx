@@ -1,4 +1,11 @@
-import { Label, Pagination, ToolbarItem, ToolbarItemVariant } from '@patternfly/react-core';
+import {
+  Flex,
+  Label,
+  LabelColor,
+  Pagination,
+  ToolbarItem,
+  ToolbarItemVariant,
+} from '@patternfly/react-core';
 import { SkeletonTableBody, ErrorState } from '@patternfly/react-component-groups';
 import { DataView } from '@patternfly/react-data-view/dist/dynamic/DataView';
 import {
@@ -21,25 +28,30 @@ import {
 import { useCoverageReportPackagesQuery } from 'services/Lightwell/CoverageReportsQueries';
 import { matchFilterOptions, usePackageCoverageTable } from '../hooks/usePackageCoverageTable';
 import type { CoverageReportPackage } from 'services/Lightwell/CoverageReportsApi';
+import type { EcosystemInfo } from '../utils/ecosystem';
 
 const COLUMNS = ['Package', 'Version', 'Ecosystem', 'Match'];
 
 const MATCH_STATUS_LABEL: Record<
   CoverageReportPackage['match_status'],
-  { text: string; color: 'green' | 'yellow' | 'grey' }
+  { text: string; color: LabelColor }
 > = {
-  exact: { text: 'Exact', color: 'green' },
-  partial: { text: 'Partial', color: 'yellow' },
-  none: { text: 'None', color: 'grey' },
+  exact: { text: 'Exact', color: LabelColor.green },
+  partial: { text: 'Partial', color: LabelColor.yellow },
+  none: { text: 'None', color: LabelColor.grey },
 };
 
 type PackageCoverageTableProps = {
   uuid: string;
-  ecosystems: string[];
+  ecosystems: EcosystemInfo[];
 };
 
 const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) => {
   const useMock = LIGHTWELL_LENS_USE_MOCK;
+  const ecosystemNames = ecosystems.map(({ name }) => name);
+  const ecosystemSupportByName = new Map(
+    ecosystems.map(({ name, supported }) => [name, supported]),
+  );
 
   const {
     filters,
@@ -50,13 +62,13 @@ const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) =
     handleFilterChange,
     paginationProps,
     ecosystemFilterOptions,
-  } = usePackageCoverageTable(ecosystems);
+  } = usePackageCoverageTable(ecosystemNames);
 
   const { page, perPage } = paginationProps;
 
   const mockPackagesQuery = useQuery({
-    queryKey: [MOCK_COVERAGE_PACKAGES_QUERY_KEY, page, perPage, debouncedFilters, ecosystems],
-    queryFn: () => getMockCoveragePackagesList(page, perPage, debouncedFilters, ecosystems),
+    queryKey: [MOCK_COVERAGE_PACKAGES_QUERY_KEY, page, perPage, debouncedFilters, ecosystemNames],
+    queryFn: () => getMockCoveragePackagesList(page, perPage, debouncedFilters, ecosystemNames),
     placeholderData: keepPreviousData,
     staleTime: 60000,
     enabled: useMock,
@@ -92,25 +104,32 @@ const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) =
 
   const dataViewColumns: DataViewTh[] = COLUMNS.map((name, index) => ({
     cell: name,
-    props: { width: ([40, 20, 20, 20] as const)[index] },
+    props: { width: ([35, 20, 25, 20] as const)[index] },
   }));
+
   const dataViewRows: DataViewTrObject[] = packages.map((pkg: CoverageReportPackage) => {
     const { text, color } = MATCH_STATUS_LABEL[pkg.match_status];
+    const supported = ecosystemSupportByName.get(pkg.ecosystem)!;
     return {
       id: `${pkg.ecosystem}-${pkg.name}-${pkg.version}`,
       row: [
         { cell: pkg.name },
         { cell: pkg.version || '—' },
-        { cell: pkg.ecosystem },
         {
           cell: (
-            <Label
-              isCompact
-              color={color}
-              className={
-                pkg.match_status === 'partial' ? 'lightwell-match-label-partial' : undefined
-              }
-            >
+            <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
+              <span>{pkg.ecosystem}</span>
+              {supported ? null : (
+                <Label variant='outline' color={LabelColor.grey} isCompact>
+                  Unsupported
+                </Label>
+              )}
+            </Flex>
+          ),
+        },
+        {
+          cell: (
+            <Label isCompact color={color}>
               {text}
             </Label>
           ),
