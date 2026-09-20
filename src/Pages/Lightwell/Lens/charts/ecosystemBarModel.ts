@@ -5,16 +5,6 @@ import type {
   EcosystemCoverageSummary,
 } from 'services/Lightwell/CoverageReportsApi';
 
-export const ECOSYSTEM_CHART_MIN_WIDTH = 500;
-export const ECOSYSTEM_CHART_PADDING = { bottom: 65, left: 100, right: 20, top: 10 };
-export const ECOSYSTEM_CHART_DOMAIN_PADDING = { x: [15, 15] as [number, number] };
-
-export const CATEGORY_AXIS_STYLE = { tickLabels: { fontSize: 14 } };
-export const COUNT_AXIS_STYLE = {
-  tickLabels: { fontSize: 14 },
-  axisLabel: { fontSize: 14, padding: 50 },
-};
-
 export const getEcosystemBarChartHeight = (ecosystemCount: number): number =>
   75 + ecosystemCount * 55;
 

@@ -12,8 +12,11 @@ import { useMemo, type CSSProperties, type Ref } from 'react';
 import {
   CATEGORY_AXIS_STYLE,
   COUNT_AXIS_STYLE,
+  ECOSYSTEM_BAR_LEGEND_SWATCH_SIZE,
   ECOSYSTEM_CHART_DOMAIN_PADDING,
   ECOSYSTEM_CHART_PADDING,
+} from './chartTheme';
+import {
   formatEcosystemName,
   formatIntegerTicks,
   getEcosystemChartModel,
@@ -42,7 +45,6 @@ export type EcosystemBarChartPdfProps = EcosystemBarChartBase & {
 
 export type EcosystemBarChartProps = EcosystemBarChartWebProps | EcosystemBarChartPdfProps;
 
-const LEGEND_SWATCH_SIZE = 12;
 const BAR_STYLE: ChartBarProps['style'] = {
   data: { fill: ({ datum }) => (datum as EcosystemBarDatum).fill },
 };
@@ -61,8 +63,8 @@ const getBarTooltipProps = (kind: string, showTooltips: boolean) => {
 
 const getLegendSwatchStyle = (fill: string): CSSProperties => ({
   display: 'block',
-  width: LEGEND_SWATCH_SIZE,
-  height: LEGEND_SWATCH_SIZE,
+  width: ECOSYSTEM_BAR_LEGEND_SWATCH_SIZE,
+  height: ECOSYSTEM_BAR_LEGEND_SWATCH_SIZE,
   backgroundColor: fill,
 });
 
