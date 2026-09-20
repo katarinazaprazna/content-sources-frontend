@@ -117,7 +117,12 @@ const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) =
         { cell: pkg.version || '—' },
         {
           cell: (
-            <Flex alignItems={{ default: 'alignItemsCenter' }} gap={{ default: 'gapSm' }}>
+            <Flex
+              alignItems={{ default: 'alignItemsCenter' }}
+              gap={{ default: 'gapSm' }}
+              flexWrap={{ default: 'nowrap' }}
+              style={{ minWidth: 0 }}
+            >
               <span>{pkg.ecosystem}</span>
               {supported ? null : (
                 <Label variant='outline' color={LabelColor.grey} isCompact>
