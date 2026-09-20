@@ -26,7 +26,6 @@ import {
   getEcosystemChartA11yTable,
 } from './ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
-import { formatEcosystemName } from '../utils/ecosystem';
 
 type EcosystemBarChartBase = {
   report: CompletedCoverageReport;
@@ -57,7 +56,9 @@ const getBarTooltipProps = (kind: string, showTooltips: boolean) => {
   return {
     labelComponent: <ChartTooltip constrainToVisibleArea />,
     labels: ({ datum }: { datum: EcosystemBarDatum }) =>
-      datum.y > 0 ? `${formatEcosystemName(datum.x, datum.supported)} ${kind}: ${datum.y}` : null,
+      datum.y > 0
+        ? `${kind}: ${datum.y} packages${datum.supported ? '' : ' (ecosystem unsupported)'}`
+        : null,
   };
 };
 
@@ -156,17 +157,17 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
           <ChartBar
             data={exactPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('exact match', showTooltips)}
+            {...getBarTooltipProps('Exact match', showTooltips)}
           />
           <ChartBar
             data={partialPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('partial match', showTooltips)}
+            {...getBarTooltipProps('Partial match', showTooltips)}
           />
           <ChartBar
             data={unmatchedPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('no match', showTooltips)}
+            {...getBarTooltipProps('No match', showTooltips)}
           />
         </ChartStack>
       </Chart>
