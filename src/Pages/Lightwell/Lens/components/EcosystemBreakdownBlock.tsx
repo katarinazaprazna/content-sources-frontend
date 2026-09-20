@@ -7,11 +7,11 @@ import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReports
 import { useContainerWidth } from '../../hooks/useContainerWidth';
 import EcosystemBarChart from '../charts/EcosystemBarChart';
 
-type EcosystemBreakdownCardProps = {
+type EcosystemBreakdownBlockProps = {
   report: CompletedCoverageReport;
 };
 
-const EcosystemBreakdownCard = ({ report }: EcosystemBreakdownCardProps) => {
+const EcosystemBreakdownBlock = ({ report }: EcosystemBreakdownBlockProps) => {
   const { containerRef, width: chartWidth } = useContainerWidth(ECOSYSTEM_CHART_MIN_WIDTH);
 
   const inCatalog = report.exact_matches + report.partial_matches;
@@ -41,4 +41,4 @@ const EcosystemBreakdownCard = ({ report }: EcosystemBreakdownCardProps) => {
   );
 };
 
-export default EcosystemBreakdownCard;
+export default EcosystemBreakdownBlock;

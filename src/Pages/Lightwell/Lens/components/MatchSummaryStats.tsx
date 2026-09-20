@@ -52,11 +52,15 @@ const MatchSummaryStats = ({ items }: MatchSummaryStatsProps) => (
                 </Flex>
               </FlexItem>
               <FlexItem>
-                <Content component='p' className={text.fontSizeSm}>
-                  {label}{' '}
-                  <Tooltip content={tooltip} position='bottom'>
-                    <OutlinedQuestionCircleIcon className={text.textColorSubtle} />
-                  </Tooltip>
+                <Content>
+                  <Flex gap={{ default: 'gapXs' }}>
+                    <FlexItem>{label}</FlexItem>
+                    <FlexItem>
+                      <Tooltip content={tooltip} position='bottom'>
+                        <OutlinedQuestionCircleIcon className={text.textColorSubtle} />
+                      </Tooltip>
+                    </FlexItem>
+                  </Flex>
                 </Content>
               </FlexItem>
             </Flex>

@@ -13,7 +13,7 @@ import { useContainerWidth } from '../../hooks/useContainerWidth';
 import MatchSummaryStats, { type MatchSummaryItem } from './MatchSummaryStats';
 import MatchDonutChart from '../charts/MatchDonutChart';
 
-type CoverageSummaryCardProps = {
+type CoverageSummaryBlockProps = {
   report: CompletedCoverageReport;
 };
 
@@ -39,7 +39,7 @@ const getMatchSummaryItems = (report: CompletedCoverageReport): MatchSummaryItem
   },
 ];
 
-const CoverageSummaryCard = ({ report }: CoverageSummaryCardProps) => {
+const CoverageSummaryBlock = ({ report }: CoverageSummaryBlockProps) => {
   const { containerRef, width: chartWidth } = useContainerWidth(COVERAGE_DONUT_WIDTH);
 
   const percentage = getMatchedPackagePercentage(report);
@@ -62,7 +62,8 @@ const CoverageSummaryCard = ({ report }: CoverageSummaryCardProps) => {
               <strong>{percentage}%</strong> of packages match the Lightwell Network catalog
             </Title>
             <Content component='p' className={`${text.textColorSubtle} ${spacing.mtSm}`}>
-              Covers supported and not-yet-supported ecosystems in your stack.
+              Includes packages from every detected ecosystem, including ecosystems the catalog does
+              not support.
             </Content>
           </FlexItem>
           <FlexItem>
@@ -74,4 +75,4 @@ const CoverageSummaryCard = ({ report }: CoverageSummaryCardProps) => {
   );
 };
 
-export default CoverageSummaryCard;
+export default CoverageSummaryBlock;

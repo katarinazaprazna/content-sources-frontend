@@ -13,8 +13,8 @@ import {
 } from '@patternfly/react-core';
 import { PlusIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import CoverageSummaryCard from './components/CoverageSummaryCard';
-import EcosystemBreakdownCard from './components/EcosystemBreakdownCard';
+import CoverageSummaryBlock from './components/CoverageSummaryBlock';
+import EcosystemBreakdownBlock from './components/EcosystemBreakdownBlock';
 import PackageCoverageTable from './components/PackageCoverageTable';
 import RemediatedDataWarning from '../RemediatedDataWarning';
 import { useCoverageReport } from './hooks/useCoverageReport';
@@ -82,10 +82,10 @@ const CoverageReport = () => {
       >
         <Stack hasGutter style={{ maxWidth: 1200, gap: '3rem' }}>
           <StackItem>
-            <CoverageSummaryCard report={report} />
+            <CoverageSummaryBlock report={report} />
           </StackItem>
           <StackItem>
-            <EcosystemBreakdownCard report={report} />
+            <EcosystemBreakdownBlock report={report} />
           </StackItem>
           <StackItem>
             <Card isGlass>
