@@ -24,6 +24,7 @@ import {
   type EcosystemChartA11yTable,
   type EcosystemChartLegendItem,
   getEcosystemChartA11yTable,
+  hasBarData,
 } from './ecosystemBarModel';
 import type { CompletedCoverageReport } from 'services/Lightwell/CoverageReportsApi';
 
@@ -48,19 +49,13 @@ const BAR_STYLE: ChartBarProps['style'] = {
   data: { fill: ({ datum }) => (datum as EcosystemBarDatum).fill },
 };
 
-const getBarTooltipProps = (kind: string, showTooltips: boolean) => {
-  if (!showTooltips) {
-    return {};
-  }
-
-  return {
-    labelComponent: <ChartTooltip constrainToVisibleArea />,
-    labels: ({ datum }: { datum: EcosystemBarDatum }) =>
-      datum.y > 0
-        ? `${kind}: ${datum.y} packages${datum.supported ? '' : ' (ecosystem unsupported)'}`
-        : null,
-  };
-};
+const getBarTooltipProps = (kind: string) => ({
+  labelComponent: <ChartTooltip constrainToVisibleArea />,
+  labels: ({ datum }: { datum: EcosystemBarDatum }) =>
+    datum.y > 0
+      ? `${kind}: ${datum.y} packages${datum.supported ? '' : ' (ecosystem unsupported)'}`
+      : null,
+});
 
 const getLegendSwatchStyle = (fill: string): CSSProperties => ({
   display: 'block',
@@ -157,17 +152,23 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
           <ChartBar
             data={exactPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('Exact match', showTooltips)}
+            {...(showTooltips && hasBarData(exactPackages)
+              ? getBarTooltipProps('Exact match')
+              : {})}
           />
           <ChartBar
             data={partialPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('Partial match', showTooltips)}
+            {...(showTooltips && hasBarData(partialPackages)
+              ? getBarTooltipProps('Partial match')
+              : {})}
           />
           <ChartBar
             data={unmatchedPackages}
             style={BAR_STYLE}
-            {...getBarTooltipProps('No match', showTooltips)}
+            {...(showTooltips && hasBarData(unmatchedPackages)
+              ? getBarTooltipProps('No match')
+              : {})}
           />
         </ChartStack>
       </Chart>
