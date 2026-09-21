@@ -11,6 +11,7 @@ import { t_global_font_weight_body_default } from '@patternfly/react-tokens/dist
 import type { CSSProperties } from 'react';
 
 import type { CoverageMatchStatus } from 'services/Lightwell/CoverageReportsApi';
+import { LIGHTWELL_ECOSYSTEM_KEY_BY_LABEL } from '../utils/ecosystem';
 
 // Shared
 
@@ -28,18 +29,6 @@ export type MatchStatusColorKey = keyof typeof MATCH_STATUS_COLORS;
 
 // Bar chart
 
-// Keys must match `$lw-ecosystem-colors` in styles/lightwell-coverage-charts.scss
-export const ECOSYSTEM_BRAND_KEYS = {
-  java: { label: 'Java' },
-  python: { label: 'Python' },
-} as const;
-
-export type EcosystemBrandKey = keyof typeof ECOSYSTEM_BRAND_KEYS;
-
-export const BRAND_KEY_BY_LABEL = new Map<string, EcosystemBrandKey>(
-  Object.entries(ECOSYSTEM_BRAND_KEYS).map(([key, { label }]) => [label, key as EcosystemBrandKey]),
-);
-
 export const ECOSYSTEM_BAR_LEGEND_SWATCH_SIZE = 12;
 export const ECOSYSTEM_CHART_MIN_WIDTH = 500;
 export const ECOSYSTEM_CHART_PADDING = { bottom: 65, left: 100, right: 20, top: 10 };
@@ -51,7 +40,7 @@ export const COUNT_AXIS_STYLE = {
   axisLabel: { fontSize: 14, padding: 50 },
 };
 
-// Applied to unknown ecosystems with no backend mapping (no token is defined for them in ECOSYSTEM_BRAND_KEYS):
+// Applied to unknown ecosystems with no backend mapping (no token is defined for them in LIGHTWELL_ECOSYSTEMS):
 // https://github.com/content-services/content-sources-backend/blob/fea90711c14c715cae6ad9b13cfb397e3d2807a2/pkg/coverage/parser/parser.go#L11
 const ECOSYSTEM_BAR_FALLBACK_COLORS = {
   exact: chart_color_purple_300.var,
@@ -62,7 +51,7 @@ export const getEcosystemMatchColor = (
   ecosystem: string,
   matchStatus: Exclude<CoverageMatchStatus, 'none'>,
 ): string => {
-  const key = BRAND_KEY_BY_LABEL.get(ecosystem);
+  const key = LIGHTWELL_ECOSYSTEM_KEY_BY_LABEL.get(ecosystem);
   if (!key) return ECOSYSTEM_BAR_FALLBACK_COLORS[matchStatus];
   return `var(--lw-color-${key}-${matchStatus})`;
 };
