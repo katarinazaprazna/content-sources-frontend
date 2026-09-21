@@ -28,6 +28,8 @@ type EcosystemChartModel = {
   unmatchedPackages: EcosystemBarDatum[];
 };
 
+export const hasBarData = (bars: EcosystemBarDatum[]): boolean => bars.some(({ y }) => y > 0);
+
 export const orderSummaries = (summaries: EcosystemCoverageSummary[]): EcosystemCoverageSummary[] =>
   [...summaries].sort((a, b) => {
     if (a.supported !== b.supported) return a.supported ? 1 : -1; // Unsupported first
