@@ -41,6 +41,7 @@ export type EcosystemBarChartWebProps = EcosystemBarChartBase & {
 
 export type EcosystemBarChartPdfProps = EcosystemBarChartBase & {
   surface: 'pdf';
+  showLegend?: boolean;
 };
 
 export type EcosystemBarChartProps = EcosystemBarChartWebProps | EcosystemBarChartPdfProps;
@@ -123,9 +124,8 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
   const { report, width, height } = props;
   const isPdf = props.surface === 'pdf';
 
-  // Web (default): tooltips, responsive-width container, no legend. PDF: no tooltips, fixed size, legend
   const showTooltips = !isPdf;
-  const showLegend = isPdf;
+  const showLegend = isPdf && props.showLegend !== false;
   const containerRef = isPdf ? undefined : props.containerRef;
 
   const model = useMemo(() => getEcosystemChartModel(report), [report]);
@@ -185,6 +185,10 @@ const EcosystemBarChart = (props: EcosystemBarChartProps) => {
         <ChartA11yTable {...a11yTable} />
       </>
     );
+  }
+
+  if (!showLegend) {
+    return plot;
   }
 
   return (

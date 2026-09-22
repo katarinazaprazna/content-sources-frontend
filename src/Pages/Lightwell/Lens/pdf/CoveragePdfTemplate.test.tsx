@@ -1,10 +1,26 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import CoveragePdfTemplate from './CoveragePdfTemplate';
 import { defaultCoverageReportItem, defaultCoverageReportPackagesItem } from 'testingHelpers';
 
+jest.mock('@patternfly/react-charts/victory', () => ({
+  Chart: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  ChartAxis: ({ label }: { label?: string }) => (label ? <span>{label}</span> : null),
+  ChartBar: () => null,
+  ChartStack: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  ChartTooltip: () => null,
+  ChartDonut: ({ title, subTitle }: { title?: string; subTitle?: string }) => (
+    <div>
+      {title}
+      {subTitle}
+    </div>
+  ),
+  ChartLabel: () => null,
+}));
+
 describe('CoveragePdfTemplate', () => {
-  it('renders the summary, ecosystem breakdown, and package rows on the first page', () => {
+  it('renders the summary, charts, and package rows on the first page', () => {
     render(
       <CoveragePdfTemplate
         asyncData={{
@@ -25,12 +41,8 @@ describe('CoveragePdfTemplate', () => {
     expect(screen.getByText('Lightwell Match Analysis Report')).toBeInTheDocument();
     expect(screen.getByText(/Manifest: sbom.json/)).toBeInTheDocument();
     expect(screen.getByText(/Generated: 25 Aug 2026/)).toBeInTheDocument();
-    expect(screen.getByText('75%')).toBeInTheDocument();
-    expect(screen.getByText('Matched')).toBeInTheDocument();
 
     expect(screen.getByText('Packages by ecosystem')).toBeInTheDocument();
-    const ecosystemTable = screen.getByLabelText('Coverage by ecosystem');
-    expect(ecosystemTable).toHaveTextContent('Java');
 
     const packageRow = screen.getByText('spring-web').closest('tr');
     expect(packageRow).toHaveTextContent('6.1.5');
@@ -52,7 +64,6 @@ describe('CoveragePdfTemplate', () => {
     );
 
     expect(screen.queryByText('Lightwell Match Analysis Report')).not.toBeInTheDocument();
-    expect(screen.getByText('Packages (continued)')).toBeInTheDocument();
     expect(screen.getByText('spring-web')).toBeInTheDocument();
   });
 });

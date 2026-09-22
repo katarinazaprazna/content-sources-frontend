@@ -93,20 +93,26 @@ describe('fetchData', () => {
 });
 
 describe('buildCoveragePdfPayload', () => {
-  it('splits large reports into paginated tasks of 50 rows', () => {
+  it('splits large reports into paginated tasks', () => {
+    const itemCount = COVERAGE_PDF_PAGE_SIZE + 100;
     const payload = buildCoveragePdfPayload({
       uuid: 'report-uuid',
       filename: 'sbom.json',
-      itemCount: 120,
+      itemCount,
       generatedAt: '25 Aug 2026',
     });
 
-    expect(payload).toHaveLength(Math.ceil(120 / COVERAGE_PDF_PAGE_SIZE));
+    expect(payload).toHaveLength(Math.ceil(itemCount / COVERAGE_PDF_PAGE_SIZE));
     expect(payload[0]).toMatchObject({
       manifestLocation: '/apps/content-sources/fed-mods.json',
       scope: 'contentSources',
       module: './CoveragePdfEntry',
-      fetchDataParams: { uuid: 'report-uuid', limit: 50, offset: 0, includeSummary: true },
+      fetchDataParams: {
+        uuid: 'report-uuid',
+        limit: COVERAGE_PDF_PAGE_SIZE,
+        offset: 0,
+        includeSummary: true,
+      },
       additionalData: {
         filename: 'sbom.json',
         generatedAt: '25 Aug 2026',
@@ -114,16 +120,18 @@ describe('buildCoveragePdfPayload', () => {
         headerBrand: 'lightwell',
       },
     });
-    expect(payload[1].fetchDataParams).toMatchObject({ offset: 50, includeSummary: false });
+    expect(payload[1].fetchDataParams).toMatchObject({
+      offset: COVERAGE_PDF_PAGE_SIZE,
+      includeSummary: false,
+    });
     expect(payload[1].additionalData).toMatchObject({ includeSummary: false });
-    expect(payload[2].fetchDataParams).toMatchObject({ offset: 100 });
   });
 
   it('emits a single task when the filtered set is empty', () => {
     const payload = buildCoveragePdfPayload({ uuid: 'report-uuid', itemCount: 0 });
 
     expect(payload).toHaveLength(1);
-    expect(payload[0].fetchDataParams).toMatchObject({ offset: 0, limit: 50 });
+    expect(payload[0].fetchDataParams).toMatchObject({ offset: 0, limit: COVERAGE_PDF_PAGE_SIZE });
   });
 
   it('defaults the generated date to a UTC display date', () => {

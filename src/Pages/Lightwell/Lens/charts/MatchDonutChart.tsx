@@ -44,13 +44,13 @@ const MatchDonutChart = (props: MatchDonutChartProps) => {
       data={donutData}
       colorScale={DONUT_COLOR_SCALE}
       allowTooltip={showTooltips}
-      labels={showTooltips ? getDonutLabel : undefined}
-      title={`${percentage}%`}
-      subTitle='packages matched'
+      labels={isPdf ? () => '' : showTooltips ? getDonutLabel : undefined}
+      title={isPdf ? ' ' : `${percentage}%`}
+      subTitle={isPdf ? undefined : 'packages matched'}
       titleComponent={
         <ChartLabel
           lineHeight={COVERAGE_DONUT_TITLE_LINE_HEIGHT}
-          style={DONUT_TITLE_AND_SUBTITLE_STYLE}
+          style={isPdf ? [{ fontSize: 0 }] : DONUT_TITLE_AND_SUBTITLE_STYLE}
         />
       }
       width={width}

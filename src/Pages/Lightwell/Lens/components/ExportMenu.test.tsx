@@ -4,6 +4,7 @@ import { AlertVariant } from '@patternfly/react-core';
 
 import { ExportMenu } from './ExportMenu';
 import { getCoverageReportPackages } from 'services/Lightwell/CoverageReportsApi';
+import { COVERAGE_PDF_PAGE_SIZE } from '../pdf/coveragePdf';
 
 jest.mock('@redhat-cloud-services/frontend-components/useChrome', () => ({
   useChrome: jest.fn(),
@@ -43,7 +44,7 @@ beforeEach(() => {
   (getCoverageReportPackages as jest.Mock).mockResolvedValue({
     data: [],
     links: { first: '', last: '' },
-    meta: { count: 120, limit: 1, offset: 0 },
+    meta: { count: COVERAGE_PDF_PAGE_SIZE * 3 - 30, limit: 1, offset: 0 },
   });
 });
 
@@ -71,15 +72,15 @@ describe('ExportMenu PDF', () => {
       module: './CoveragePdfEntry',
       fetchDataParams: {
         uuid: 'report-uuid',
-        limit: 50,
+        limit: COVERAGE_PDF_PAGE_SIZE,
         offset: 0,
         includeSummary: true,
         filters: { match_status: ['exact'] },
       },
       additionalData: { includeSummary: true, filename: 'sbom.json', headerBrand: 'lightwell' },
     });
-    expect(pdfRequest.payload[1].fetchDataParams.offset).toBe(50);
-    expect(pdfRequest.payload[2].fetchDataParams.offset).toBe(100);
+    expect(pdfRequest.payload[1].fetchDataParams.offset).toBe(COVERAGE_PDF_PAGE_SIZE);
+    expect(pdfRequest.payload[2].fetchDataParams.offset).toBe(COVERAGE_PDF_PAGE_SIZE * 2);
   });
 
   it('closes the menu and shows generating feedback while the PDF is in progress', async () => {
