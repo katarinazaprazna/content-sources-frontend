@@ -5,6 +5,7 @@ import useDebounce from 'Hooks/useDebounce';
 import { usePaginationLocalStorage } from 'Hooks/tables/usePaginationLocalStorage';
 import { lightwellCoveragePkgsPerPageKey } from 'Pages/Lightwell/constants';
 import type { CoverageReportPackageFilters } from 'services/Lightwell/CoverageReportsApi';
+import { EcosystemInfo } from '../utils/ecosystem';
 
 export const matchFilterOptions: DataViewFilterOption[] = [
   { label: 'Exact', value: 'exact' },
@@ -18,7 +19,7 @@ const initialFilters: CoverageReportPackageFilters = {
   ecosystem: [],
 };
 
-export const usePackageCoverageTable = (ecosystems: string[]) => {
+export const usePackageCoverageTable = (ecosystems: EcosystemInfo[]) => {
   const { page, perPage, onPerPageSelect, onSetPage, setPage } = usePaginationLocalStorage({
     key: lightwellCoveragePkgsPerPageKey,
   });
@@ -60,7 +61,7 @@ export const usePackageCoverageTable = (ecosystems: string[]) => {
   );
 
   const ecosystemFilterOptions: DataViewFilterOption[] = useMemo(
-    () => ecosystems.map((ecosystem) => ({ label: ecosystem, value: ecosystem })),
+    () => ecosystems.map((ecosystem) => ({ label: ecosystem.name, value: ecosystem.name })),
     [ecosystems],
   );
 

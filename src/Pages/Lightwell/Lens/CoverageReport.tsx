@@ -5,6 +5,8 @@ import {
   Button,
   Card,
   CardBody,
+  Flex,
+  FlexItem,
   PageSection,
   Stack,
   StackItem,
@@ -16,8 +18,10 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import CoverageSummaryBlock from './components/CoverageSummaryBlock';
 import EcosystemBreakdownBlock from './components/EcosystemBreakdownBlock';
 import PackageCoverageTable from './components/PackageCoverageTable';
+import { ExportMenu } from './components/ExportMenu';
 import RemediatedDataWarning from '../RemediatedDataWarning';
 import { useCoverageReport } from './hooks/useCoverageReport';
+import { usePackageCoverageTable } from './hooks/usePackageCoverageTable';
 import Loader from 'components/Loader';
 import LightwellNotFound from '../components/LightwellNotFound';
 import type { EcosystemInfo } from './utils/ecosystem';
@@ -34,6 +38,9 @@ const CoverageReport = () => {
       })) ?? [],
     [report],
   );
+
+  // Lifted so the export reuses whatever filters the table currently has applied.
+  const table = usePackageCoverageTable(ecosystems);
 
   if (isLoading) return <Loader />;
   if (isError) throw error;
@@ -64,14 +71,21 @@ const CoverageReport = () => {
         title={matchAnalysisTitle}
         ouiaId='lightwell-coverage-header'
         actions={
-          <Button
-            variant='secondary'
-            icon={<PlusIcon />}
-            ouiaId='lightwell-new-analysis-button'
-            onClick={startOver}
-          >
-            New analysis
-          </Button>
+          <Flex gap={{ default: 'gapSm' }}>
+            <FlexItem>
+              <ExportMenu uuid={report.uuid} filename={filename} filters={table.debouncedFilters} />
+            </FlexItem>
+            <FlexItem>
+              <Button
+                variant='secondary'
+                icon={<PlusIcon />}
+                ouiaId='lightwell-new-analysis-button'
+                onClick={startOver}
+              >
+                New analysis
+              </Button>
+            </FlexItem>
+          </Flex>
         }
       />
       {/* plXs matches the mXs margin LightwellPageHeader applies to its inner title flex, keeping content left-aligned */}
@@ -92,7 +106,7 @@ const CoverageReport = () => {
               <CardBody>
                 {/* Remove Flex because it interacts with DataView's 100%-height and creates extra space below pagination */}
                 <RemediatedDataWarning className={spacing.mbMd} />
-                <PackageCoverageTable uuid={report.uuid} ecosystems={ecosystems} />
+                <PackageCoverageTable uuid={report.uuid} ecosystems={ecosystems} table={table} />
               </CardBody>
             </Card>
           </StackItem>

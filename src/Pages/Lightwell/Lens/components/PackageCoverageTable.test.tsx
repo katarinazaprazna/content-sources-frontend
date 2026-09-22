@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import PackageCoverageTable from './PackageCoverageTable';
+import { usePackageCoverageTable } from '../hooks/usePackageCoverageTable';
 import { useCoverageReportPackagesQuery } from 'services/Lightwell/CoverageReportsQueries';
 import { defaultCoverageReportPackagesItem, ReactQueryTestWrapper } from 'testingHelpers';
 import type { EcosystemInfo } from '../utils/ecosystem';
@@ -16,6 +17,11 @@ jest.mock('Pages/Lightwell/constants', () => ({
   LIGHTWELL_LENS_USE_MOCK: false,
 }));
 
+const PackageCoverageTableHarness = ({ ecosystems }: { ecosystems: EcosystemInfo[] }) => {
+  const table = usePackageCoverageTable(ecosystems);
+  return <PackageCoverageTable uuid='test-uuid' ecosystems={ecosystems} table={table} />;
+};
+
 const DEFAULT_ECOSYSTEMS: EcosystemInfo[] = [
   { name: 'Java', supported: true },
   { name: 'Python', supported: true },
@@ -25,7 +31,7 @@ const DEFAULT_ECOSYSTEMS: EcosystemInfo[] = [
 const renderTable = (ecosystems: EcosystemInfo[] = DEFAULT_ECOSYSTEMS) =>
   render(
     <ReactQueryTestWrapper>
-      <PackageCoverageTable uuid='test-uuid' ecosystems={ecosystems} />
+      <PackageCoverageTableHarness ecosystems={ecosystems} />
     </ReactQueryTestWrapper>,
   );
 

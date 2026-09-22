@@ -9,6 +9,12 @@ import {
 import { useLightwellNavigateTo } from 'Hooks/Lightwell/navigation/useLightwellNavigateTo';
 import { useCoverageReportPackagesQuery } from 'services/Lightwell/CoverageReportsQueries';
 
+jest.mock('@redhat-cloud-services/frontend-components/useChrome', () => ({
+  useChrome: () => ({
+    requestPdf: jest.fn(),
+  }),
+}));
+
 jest.mock('./hooks/useCoverageReport');
 
 // Charts (including the bar chart's screen-reader table) are tested in their own files

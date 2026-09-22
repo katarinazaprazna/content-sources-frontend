@@ -44,9 +44,11 @@ const MATCH_STATUS_LABEL: Record<
 type PackageCoverageTableProps = {
   uuid: string;
   ecosystems: EcosystemInfo[];
+  // Table state is lifted so the page-level export can reuse the active filters.
+  table: ReturnType<typeof usePackageCoverageTable>;
 };
 
-const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) => {
+const PackageCoverageTable = ({ uuid, ecosystems, table }: PackageCoverageTableProps) => {
   const useMock = LIGHTWELL_LENS_USE_MOCK;
   const ecosystemNames = ecosystems.map(({ name }) => name);
   const ecosystemSupportByName = new Map(
@@ -62,7 +64,7 @@ const PackageCoverageTable = ({ uuid, ecosystems }: PackageCoverageTableProps) =
     handleFilterChange,
     paginationProps,
     ecosystemFilterOptions,
-  } = usePackageCoverageTable(ecosystemNames);
+  } = table;
 
   const { page, perPage } = paginationProps;
 
