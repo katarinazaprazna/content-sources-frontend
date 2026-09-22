@@ -420,7 +420,7 @@ it('shows an empty state on the Releases tab when the selected version has no Li
     <PackageReleasesTab
       version={version.version}
       builds={version.builds}
-      formatCopyText={(copyVersion) => copyVersion}
+      packageIdentity={{ name: 'json-test' }}
     />,
   );
 

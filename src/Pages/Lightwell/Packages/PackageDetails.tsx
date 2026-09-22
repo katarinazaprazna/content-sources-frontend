@@ -40,13 +40,7 @@ import {
   usePythonPackageVersionsQuery,
 } from 'services/Content/ContentQueries';
 import { LIGHTWELL_USE_MOCK } from '../constants';
-import {
-  formatDistributionUrl,
-  formatRepositoryName,
-  lightwellReleaseNum,
-  sortVersionsDesc,
-  stripLightwellVersionSuffix,
-} from '../helpers';
+import { formatDistributionUrl, formatRepositoryName } from '../helpers';
 import {
   getMockLightwellPackages,
   getMockMavenPackageVersionsList,
@@ -56,9 +50,15 @@ import RemediatedDataWarning from '../RemediatedDataWarning';
 import ConnectRepositoryModal from '../Repositories/components/ConnectRepositoryModal';
 import useLightwellRepository from '../../../Hooks/Lightwell/useLightwellRepository';
 import PackageOverviewTab from './components/PackageOverviewTab';
-import PackageReleasesTab, { toLightwellVersion } from './components/PackageReleasesTab';
+import PackageReleasesTab from './components/PackageReleasesTab';
 import PackageSidebar from './components/PackageSidebar';
 import PackageVersionsTab from './components/PackageVersionsTab';
+import {
+  lightwellReleaseNum,
+  sortVersionsDesc,
+  stripLightwellVersionSuffix,
+  toLightwellVersion,
+} from './utils/versions';
 import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
 import { useLightwellRootPath } from '../../../Hooks/Lightwell/navigation/useLightwellRootPath';
 
@@ -274,11 +274,6 @@ const PackageDetails = () => {
       ? toLightwellVersion(latestBuild)
       : activeVersion
     : activeVersion;
-
-  const formatReleaseCopyText = (version: string) =>
-    isMaven
-      ? `${packageGroup}:${packageName}:${version}`
-      : `pip install ${packageName}==${version}`;
 
   const lastUpdated = isMaven
     ? (builds
@@ -501,7 +496,11 @@ const PackageDetails = () => {
                         <PackageReleasesTab
                           version={upstreamVersion}
                           builds={mavenBuilds}
-                          formatCopyText={formatReleaseCopyText}
+                          packageIdentity={{
+                            name: packageName,
+                            group: packageGroup,
+                            isPython,
+                          }}
                         />
                       </TabContentBody>
                     </TabContent>
