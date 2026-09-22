@@ -29,7 +29,6 @@ it('renders title slots with actions in the remaining header area', () => {
       title='Packages'
       titleStart={<span>ecosystem icon</span>}
       titleEnd={<span>repository metadata</span>}
-      metadata='Last updated yesterday'
       actions={<Button>Connect</Button>}
     />,
   );
@@ -37,6 +36,5 @@ it('renders title slots with actions in the remaining header area', () => {
   expect(screen.getByRole('heading', { name: 'Packages' })).toBeInTheDocument();
   expect(screen.getByText('ecosystem icon')).toBeInTheDocument();
   expect(screen.getByText('repository metadata')).toBeInTheDocument();
-  expect(screen.getByText('Last updated yesterday')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument();
 });

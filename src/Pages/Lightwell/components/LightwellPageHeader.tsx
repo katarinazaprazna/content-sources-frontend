@@ -7,7 +7,6 @@ type LightwellPageHeaderProps = {
   titleStart?: ReactNode;
   titleEnd?: ReactNode;
   description?: ReactNode;
-  metadata?: ReactNode;
   actions?: ReactNode;
   ouiaId?: string;
 };
@@ -17,7 +16,6 @@ const LightwellPageHeader = ({
   titleStart,
   titleEnd,
   description,
-  metadata,
   actions,
   ouiaId,
 }: LightwellPageHeaderProps) => (
@@ -55,9 +53,6 @@ const LightwellPageHeader = ({
               {description}
             </Content>
           ) : null}
-
-          {/* Optional additional metadata belonging to the page content area. */}
-          {metadata ? <FlexItem>{metadata}</FlexItem> : null}
         </Flex>
       </FlexItem>
 

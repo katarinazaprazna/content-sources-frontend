@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardBody,
-  Content,
   Dropdown,
   DropdownItem,
   DropdownList,
@@ -347,12 +346,6 @@ const PackageDetails = () => {
               </Dropdown>
             ) : null}
           </Flex>
-        }
-        metadata={
-          <Content component='p'>
-            <strong>8</strong> fixes across <strong>5</strong> Lightwell releases | Last updated:{' '}
-            <strong>Sep 3, 2026</strong>
-          </Content>
         }
         actions={
           <ConnectRepositoryModal
