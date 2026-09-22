@@ -56,7 +56,7 @@ import RemediatedDataWarning from '../RemediatedDataWarning';
 import ConnectRepositoryModal from '../Repositories/components/ConnectRepositoryModal';
 import useLightwellRepository from '../../../Hooks/Lightwell/useLightwellRepository';
 import PackageOverviewTab from './components/PackageOverviewTab';
-import PackageReleasesTab, { buildVersionFromRelease } from './components/PackageReleasesTab';
+import PackageReleasesTab, { toLightwellVersion } from './components/PackageReleasesTab';
 import PackageSidebar from './components/PackageSidebar';
 import PackageVersionsTab from './components/PackageVersionsTab';
 import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
@@ -271,7 +271,7 @@ const PackageDetails = () => {
 
   const displayVersion = isMaven
     ? hasRelease && latestBuild
-      ? buildVersionFromRelease(latestBuild)
+      ? toLightwellVersion(latestBuild)
       : activeVersion
     : activeVersion;
 
@@ -501,9 +501,6 @@ const PackageDetails = () => {
                         <PackageReleasesTab
                           version={upstreamVersion}
                           builds={mavenBuilds}
-                          allVersions={mavenVersions}
-                          latestReleases={mavenAllReleases}
-                          onVersionSelect={setSelectedVersion}
                           formatCopyText={formatReleaseCopyText}
                         />
                       </TabContentBody>
