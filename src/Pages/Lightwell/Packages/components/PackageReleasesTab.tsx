@@ -1,9 +1,10 @@
 import { Flex, Label, Title } from '@patternfly/react-core';
-import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { useMemo } from 'react';
 
 import { RepositoryPackageReleaseInfo } from 'services/Content/ContentApi';
 import CopyLabel from './CopyLabel';
+import LightwellEmptyState from '../../components/LightwellEmptyState';
 import { lightwellReleaseNum } from '../../helpers';
 
 type PackageReleasesTabProps = {
@@ -31,35 +32,43 @@ const PackageReleasesTab = ({ version, builds, formatCopyText }: PackageReleases
       <Title headingLevel='h2' size='xl'>
         Releases for version {version}
       </Title>
-      <Table aria-label={`Releases for ${version}`} variant={TableVariant.compact}>
-        <Thead>
-          <Tr>
-            <Th>Release</Th>
-            <Th width={15}>Date released</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {releases.map((build, index) => {
-            const fullVersion = toLightwellVersion(build);
+      {releases.length === 0 ? (
+        <LightwellEmptyState
+          variant='empty'
+          titleText='No releases for this version'
+          bodyText='Lightwell has not published a release for this version yet. Select a different version to see its releases.'
+        />
+      ) : (
+        <Table aria-label={`Releases for ${version}`} isStriped>
+          <Thead>
+            <Tr>
+              <Th>Release</Th>
+              <Th width={15}>Date released</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {releases.map((build, index) => {
+              const fullVersion = toLightwellVersion(build);
 
-            return (
-              <Tr key={fullVersion}>
-                <Td dataLabel='Release'>
-                  <Flex gap={{ default: 'gapSm' }} alignItems={{ default: 'alignItemsCenter' }}>
-                    <CopyLabel copyText={formatCopyText(fullVersion)}>{fullVersion}</CopyLabel>
-                    {index === 0 ? (
-                      <Label isCompact color='blue'>
-                        Latest
-                      </Label>
-                    ) : null}
-                  </Flex>
-                </Td>
-                <Td dataLabel='Date released'>{build.created_at?.split('T')[0] ?? '—'}</Td>
-              </Tr>
-            );
-          })}
-        </Tbody>
-      </Table>
+              return (
+                <Tr key={fullVersion}>
+                  <Td dataLabel='Release'>
+                    <Flex gap={{ default: 'gapSm' }} alignItems={{ default: 'alignItemsCenter' }}>
+                      <CopyLabel copyText={formatCopyText(fullVersion)}>{fullVersion}</CopyLabel>
+                      {index === 0 ? (
+                        <Label isCompact color='blue'>
+                          Latest
+                        </Label>
+                      ) : null}
+                    </Flex>
+                  </Td>
+                  <Td dataLabel='Date released'>{build.created_at?.split('T')[0] ?? '—'}</Td>
+                </Tr>
+              );
+            })}
+          </Tbody>
+        </Table>
+      )}
     </Flex>
   );
 };

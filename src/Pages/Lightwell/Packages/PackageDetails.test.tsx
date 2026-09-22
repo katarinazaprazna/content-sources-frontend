@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import PackageDetails from './PackageDetails';
+import PackageReleasesTab from './components/PackageReleasesTab';
 import {
   useMavenPackageVersionsListQuery,
   usePythonPackageVersionsQuery,
@@ -150,33 +151,37 @@ it('shows empty state when the package has no builds', async () => {
 });
 
 const setupNoReleasePackage = () => {
+  const data = {
+    group: 'org.json.test',
+    name: 'json-test',
+    versions: [
+      {
+        group: 'org.json.test',
+        name: 'json-test',
+        version: '2.21.2',
+        builds: [{ version: '2.21.2', release: '', created_at: '2026-07-01T00:00:00Z' }],
+      },
+      {
+        group: 'org.json.test',
+        name: 'json-test',
+        version: '2.20.0',
+        builds: [{ version: '2.20.0', release: '', created_at: '2026-06-15T00:00:00Z' }],
+      },
+      {
+        group: 'org.json.test',
+        name: 'json-test',
+        version: '2.19.1',
+        builds: [{ version: '2.19.1', release: '', created_at: '2026-06-01T00:00:00Z' }],
+      },
+    ],
+  };
+
   (useMavenPackageVersionsListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
-    data: {
-      group: 'org.json.test',
-      name: 'json-test',
-      versions: [
-        {
-          group: 'org.json.test',
-          name: 'json-test',
-          version: '2.21.2',
-          builds: [{ version: '2.21.2', release: '', created_at: '2026-07-01T00:00:00Z' }],
-        },
-        {
-          group: 'org.json.test',
-          name: 'json-test',
-          version: '2.20.0',
-          builds: [{ version: '2.20.0', release: '', created_at: '2026-06-15T00:00:00Z' }],
-        },
-        {
-          group: 'org.json.test',
-          name: 'json-test',
-          version: '2.19.1',
-          builds: [{ version: '2.19.1', release: '', created_at: '2026-06-01T00:00:00Z' }],
-        },
-      ],
-    },
+    data,
   }));
+
+  return data;
 };
 
 const setupPythonRemediatedPackage = () => {
@@ -405,6 +410,25 @@ it('lists all Lightwell releases for the selected version from latest to oldest'
   expect(releaseRows[2]).toHaveTextContent('3.14.0.rhlw-00001');
   expect(releaseRows[2]).toHaveTextContent('2026-07-01');
   expect(screen.queryByText('2.12.0.rhlw-00002')).not.toBeInTheDocument();
+});
+
+it('shows an empty state on the Releases tab when the selected version has no Lightwell releases', () => {
+  const { versions } = setupNoReleasePackage();
+  const [version] = versions;
+
+  render(
+    <PackageReleasesTab
+      version={version.version}
+      builds={version.builds}
+      formatCopyText={(copyVersion) => copyVersion}
+    />,
+  );
+
+  expect(screen.getByText(`Releases for version ${version.version}`)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'No releases for this version' })).toBeInTheDocument();
+  expect(
+    screen.queryByRole('grid', { name: `Releases for ${version.version}` }),
+  ).not.toBeInTheDocument();
 });
 
 it('shows version dropdown for multi-version release packages', async () => {
