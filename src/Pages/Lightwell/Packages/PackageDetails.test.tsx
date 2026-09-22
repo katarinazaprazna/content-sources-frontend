@@ -403,12 +403,12 @@ it('lists all Lightwell releases for the selected version from latest to oldest'
   expect(releaseRows).toHaveLength(3);
   expect(releaseRows[0]).toHaveTextContent('3.14.0.rhlw-00003');
   expect(releaseRows[0]).toHaveTextContent('Latest');
-  expect(releaseRows[0]).toHaveTextContent('2026-07-03');
+  expect(releaseRows[0]).toHaveTextContent('3 Jul 2026');
   expect(releaseRows[1]).toHaveTextContent('3.14.0.rhlw-00002');
-  expect(releaseRows[1]).toHaveTextContent('2026-07-02');
+  expect(releaseRows[1]).toHaveTextContent('2 Jul 2026');
   expect(releaseRows[1]).not.toHaveTextContent('Latest');
   expect(releaseRows[2]).toHaveTextContent('3.14.0.rhlw-00001');
-  expect(releaseRows[2]).toHaveTextContent('2026-07-01');
+  expect(releaseRows[2]).toHaveTextContent('1 Jul 2026');
   expect(screen.queryByText('2.12.0.rhlw-00002')).not.toBeInTheDocument();
 });
 

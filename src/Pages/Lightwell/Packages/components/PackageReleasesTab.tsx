@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { RepositoryPackageReleaseInfo } from 'services/Content/ContentApi';
 import CopyLabel from './CopyLabel';
 import LightwellEmptyState from '../../components/LightwellEmptyState';
-import { lightwellReleaseNum } from '../../helpers';
+import { formatReleaseDate, lightwellReleaseNum } from '../../helpers';
 
 type PackageReleasesTabProps = {
   version: string;
@@ -62,7 +62,7 @@ const PackageReleasesTab = ({ version, builds, formatCopyText }: PackageReleases
                       ) : null}
                     </Flex>
                   </Td>
-                  <Td dataLabel='Date released'>{build.created_at?.split('T')[0] ?? '—'}</Td>
+                  <Td dataLabel='Date released'>{formatReleaseDate(build.created_at)}</Td>
                 </Tr>
               );
             })}
