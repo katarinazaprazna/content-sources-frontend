@@ -21,6 +21,7 @@ import {
   getMavenPackageUsageSnippetTabs,
   getPythonPackageUsageSnippetTabs,
 } from './packageDependencySnippets';
+import ReleaseFixBreakdown from './ReleaseFixBreakdown';
 
 type PackageOverviewTabProps = {
   isMaven: boolean;
@@ -100,7 +101,7 @@ const PackageOverviewTab = ({
   return (
     <Flex direction={{ default: 'column' }} gap={{ default: 'gapLg' }}>
       <Stack hasGutter>
-        <Title headingLevel='h2' size='lg'>
+        <Title headingLevel='h2' size='xl'>
           About this package
         </Title>
         <Content>
@@ -121,7 +122,10 @@ const PackageOverviewTab = ({
         </Content>
       </Stack>
       <Stack hasGutter>
-        <Title headingLevel='h2' size='lg'>
+        <ReleaseFixBreakdown />
+      </Stack>
+      <Stack hasGutter>
+        <Title headingLevel='h2' size='xl'>
           How to use
         </Title>
         <Content>
