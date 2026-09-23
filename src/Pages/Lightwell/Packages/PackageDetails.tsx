@@ -57,6 +57,7 @@ import ConnectRepositoryModal from '../Repositories/components/ConnectRepository
 import useLightwellRepository from '../../../Hooks/Lightwell/useLightwellRepository';
 import PackageOverviewTab from './components/PackageOverviewTab';
 import PackageReleasesTab, { buildVersionFromRelease } from './components/PackageReleasesTab';
+import PackageRemediationsTab from './components/PackageRemediationsTab';
 import PackageSidebar from './components/PackageSidebar';
 import PackageVersionsTab from './components/PackageVersionsTab';
 import { useLightwellNavigateTo } from '../../../Hooks/Lightwell/navigation/useLightwellNavigateTo';
@@ -98,6 +99,7 @@ const PackageDetails = () => {
   const overviewTabRef = createRef<HTMLElement>();
   const releasesTabRef = createRef<HTMLElement>();
   const versionsTabRef = createRef<HTMLElement>();
+  const remediationsTabRef = createRef<HTMLElement>();
 
   const useMock = LIGHTWELL_USE_MOCK;
 
@@ -459,6 +461,12 @@ const PackageDetails = () => {
                       ouiaId='lightwell-package-versions-tab'
                     />
                   )}
+                  <Tab
+                    eventKey={2}
+                    title={<TabTitleText>Remediations</TabTitleText>}
+                    tabContentRef={remediationsTabRef}
+                    ouiaId='lightwell-package-remediations-tab'
+                  />
                 </Tabs>
                 <>
                   <TabContent
@@ -527,6 +535,17 @@ const PackageDetails = () => {
                       </TabContentBody>
                     </TabContent>
                   )}
+                  <TabContent
+                    eventKey={2}
+                    id='lightwell-package-remediations-panel'
+                    ref={remediationsTabRef}
+                    aria-label='Remediations'
+                    hidden
+                  >
+                    <TabContentBody hasPadding>
+                      <PackageRemediationsTab version={selectedVersion || activeVersion} />
+                    </TabContentBody>
+                  </TabContent>
                 </>
               </GridItem>
               <GridItem md={4}>
