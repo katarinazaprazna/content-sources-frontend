@@ -15,16 +15,22 @@ import useErrorNotification from 'Hooks/useErrorNotification';
 import useNotification from 'Hooks/useNotification';
 import {
   getCoverageReportPackages,
+  type CoverageReportPackage,
   type CoverageReportPackageFilters,
 } from 'services/Lightwell/CoverageReportsApi';
 
 import { buildCoveragePdfPayload } from '../pdf/coveragePdf';
+import { exportToCsv, exportToJson } from '../../utils/exportUtils';
 
 type ExportMenuProps = {
   uuid?: string;
   filename?: string;
   filters?: CoverageReportPackageFilters;
 };
+
+type ExportFormat = 'csv' | 'pdf' | 'json';
+
+const EXPORT_PAGE_SIZE = 200;
 
 async function resolveCoveragePdfItemCount(
   uuid: string,
@@ -34,6 +40,28 @@ async function resolveCoveragePdfItemCount(
   return meta.count;
 }
 
+export async function fetchAllCoveragePackages(
+  uuid: string,
+  filters?: CoverageReportPackageFilters,
+): Promise<CoverageReportPackage[]> {
+  const packages: CoverageReportPackage[] = [];
+  let page = 1;
+
+  while (true) {
+    const { data } = await getCoverageReportPackages(uuid, page, EXPORT_PAGE_SIZE, filters);
+
+    packages.push(...data);
+
+    if (data.length < EXPORT_PAGE_SIZE) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return packages;
+}
+
 export function ExportMenu({ uuid, filename, filters }: ExportMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -41,7 +69,7 @@ export function ExportMenu({ uuid, filename, filters }: ExportMenuProps) {
   const { notify } = useNotification();
   const { requestPdf } = useChrome();
 
-  const handleExportPdf = async () => {
+  const handleExport = async (format: ExportFormat) => {
     if (!uuid || isExporting) {
       return;
     }
@@ -49,26 +77,36 @@ export function ExportMenu({ uuid, filename, filters }: ExportMenuProps) {
     setIsOpen(false);
     setIsExporting(true);
     try {
-      notify({
-        variant: AlertVariant.info,
-        title: 'Generating PDF',
-        description: 'Your PDF is being generated. The download will start when it is ready.',
-      });
-      const count = await resolveCoveragePdfItemCount(uuid, filters);
-      await requestPdf({
-        filename: `lightwell-match-analysis-${uuid}.pdf`,
-        payload: buildCoveragePdfPayload({
-          uuid,
-          filename,
-          filters,
-          itemCount: count,
-        }) as unknown as PDFRequestPayload,
-      });
-      notify({
-        variant: AlertVariant.success,
-        title: 'PDF ready',
-        description: 'Your download should start shortly.',
-      });
+      if (format === 'pdf') {
+        notify({
+          variant: AlertVariant.info,
+          title: 'Generating PDF',
+          description: 'Your PDF is being generated. The download will start when it is ready.',
+        });
+        const count = await resolveCoveragePdfItemCount(uuid, filters);
+        await requestPdf({
+          filename: `lightwell-match-analysis-${uuid}.pdf`,
+          payload: buildCoveragePdfPayload({
+            uuid,
+            filename,
+            filters,
+            itemCount: count,
+          }) as unknown as PDFRequestPayload,
+        });
+        notify({
+          variant: AlertVariant.success,
+          title: 'PDF ready',
+          description: 'Your download should start shortly.',
+        });
+        return;
+      }
+
+      const packages = await fetchAllCoveragePackages(uuid, filters);
+      if (format === 'csv') {
+        exportToCsv(packages, `lightwell-vulnerabilities.csv`);
+      } else {
+        exportToJson(packages, `lightwell-vulnerabilities.json`);
+      }
     } catch (err) {
       errorNotifier(
         'Error exporting report',
@@ -107,10 +145,28 @@ export function ExportMenu({ uuid, filename, filters }: ExportMenuProps) {
     >
       <DropdownList>
         <DropdownItem
+          key='csv'
+          isDisabled={isExporting}
+          onClick={() => {
+            void handleExport('csv');
+          }}
+        >
+          Export as CSV
+        </DropdownItem>
+        <DropdownItem
+          key='json'
+          isDisabled={isExporting}
+          onClick={() => {
+            void handleExport('json');
+          }}
+        >
+          Export as JSON
+        </DropdownItem>
+        <DropdownItem
           key='pdf'
           isDisabled={isExporting}
           onClick={() => {
-            void handleExportPdf();
+            void handleExport('pdf');
           }}
         >
           Export as PDF

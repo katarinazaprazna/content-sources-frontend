@@ -17,7 +17,7 @@ import { getVulnerabilities, type BeaconVulnerabilityFilters } from 'services/Li
 import type { Vulnerability } from '../types';
 
 import { buildBeaconPdfPayload } from '../pdf/beaconPdf';
-import { exportToCsv, exportToJson } from '../utils/exportUtils';
+import { exportToCsv, exportToJson } from '../../utils/exportUtils';
 import type { VulnerabilityTableColumn } from '../utils/vulnerabilityTableColumns';
 
 type ExportMenuProps = {
