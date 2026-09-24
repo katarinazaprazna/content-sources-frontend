@@ -345,7 +345,7 @@ it('unsubscribes from repository notifications when toggle is turned off', async
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
-      data: [defaultPythonRemediatedContentItem],
+      data: [javaRemediatedContentItem],
       meta: { count: 1, limit: 20, offset: 0 },
     },
   }));
@@ -353,12 +353,12 @@ it('unsubscribes from repository notifications when toggle is turned off', async
   renderRepositoriesTable();
 
   const toggle = await screen.findByRole('switch', {
-    name: `Toggle notifications for ${defaultPythonRemediatedContentItem.name}`,
+    name: `Toggle notifications for ${javaRemediatedContentItem.name}`,
   });
   expect(toggle).toBeChecked();
 
   await user.click(toggle);
-  expect(mockSetRepoSubscribed).toHaveBeenCalledWith('python-remediated', []);
+  expect(mockSetRepoSubscribed).toHaveBeenCalledWith('java-remediated', []);
 });
 
 it('renders java predisclosure repository', async () => {

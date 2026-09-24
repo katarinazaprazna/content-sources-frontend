@@ -8,6 +8,7 @@ import {
   getRepositoryNameFromPathSlug,
   getRepositoryPathSlug,
   lightwellReleaseNum,
+  pythonLightwellRelease,
   sortVersionsDesc,
   stripLightwellVersionSuffix,
 } from './helpers';
@@ -116,6 +117,11 @@ describe('stripLightwellVersionSuffix', () => {
   it('returns the original version when no Lightwell suffix exists', () => {
     expect(stripLightwellVersionSuffix('1.2.3')).toBe('1.2.3');
   });
+
+  it('separates a Python local release from its upstream version', () => {
+    expect(stripLightwellVersionSuffix('3.0.1+rhlw.12')).toBe('3.0.1');
+    expect(pythonLightwellRelease('3.0.1+rhlw.12')).toBe('+rhlw.12');
+  });
 });
 
 describe('lightwellReleaseNum', () => {
@@ -125,6 +131,7 @@ describe('lightwellReleaseNum', () => {
 
   it('extracts release number from a release suffix', () => {
     expect(lightwellReleaseNum('rhlw-00007')).toBe(7);
+    expect(lightwellReleaseNum('+rhlw.12')).toBe(12);
   });
 
   it('returns 0 when no trailing number exists', () => {

@@ -23,7 +23,7 @@ export const getPythonPackageUsageSnippetTabs = (
       {
         label: 'Install directly:',
         code: `# Source: ${pkg.sourceUrl}
-pip install --index-url ${pkg.sourceUrl}/simple ${pkg.name}==${pkg.release}`,
+pip install --index-url ${pkg.sourceUrl.replace(/\/+$/, '')}/simple ${pkg.name}==${pkg.release}`,
       },
     ],
   },

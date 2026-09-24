@@ -68,13 +68,16 @@ export const getRepositoryNameFromPathSlug = (slug: string): string => {
 };
 
 /**
- * Removes the Lightwell release suffix (.rhlw-xxxx) from a version
+ * Removes the Lightwell release suffix from a version.
  *
  * Example:
  * 1.2.3.rhlw-00001 -> 1.2.3
  */
 export const stripLightwellVersionSuffix = (version: string): string =>
-  version.replace(/\.rhlw-.*$/, '');
+  version.replace(/(?:\.rhlw-|\+rhlw\.).*$/i, '');
+
+export const pythonLightwellRelease = (version: string): string =>
+  version.slice(stripLightwellVersionSuffix(version).length);
 
 /**
  * Extracts a release number from a Lightwell version or release
@@ -84,7 +87,7 @@ export const stripLightwellVersionSuffix = (version: string): string =>
  * rhlw-0002 -> 2
  */
 export const lightwellReleaseNum = (versionOrRelease: string): number =>
-  parseInt(versionOrRelease.match(/rhlw-(\d+)$/)?.[1] ?? '0', 10);
+  parseInt(versionOrRelease.match(/rhlw[-.](\d+)/i)?.[1] ?? '0', 10);
 
 /**
  * Sorts versions in descending semantic order

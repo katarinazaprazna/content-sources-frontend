@@ -421,6 +421,52 @@ it('shows how to use section for python package', async () => {
   expect(await screen.findByRole('tab', { name: 'pip.conf' })).toBeInTheDocument();
 });
 
+it('shows Python remediated releases and copies the published pip version', async () => {
+  setupPythonRemediatedPackage();
+  (usePythonPackageVersionsQuery as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    isFetching: false,
+    data: {
+      name: 'requests',
+      versions: [
+        {
+          ...defaultPythonPackageVersions.versions[0],
+          version: '3.0.1+rhlw.1',
+          last_updated: '2026-07-01T00:00:00Z',
+        },
+        {
+          ...defaultPythonPackageVersions.versions[0],
+          version: '3.0.1+rhlw.2',
+          last_updated: '2026-07-02T00:00:00Z',
+        },
+        {
+          ...defaultPythonPackageVersions.versions[0],
+          version: '2.9.0+rhlw.1',
+          last_updated: '2026-06-01T00:00:00Z',
+        },
+      ],
+    },
+  }));
+  const writeText = mockClipboard();
+
+  renderPackageDetails();
+
+  expect(await screen.findByRole('tab', { name: 'Releases' })).toBeInTheDocument();
+  expect(screen.queryByRole('tab', { name: 'Versions' })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('tab', { name: 'Releases' }));
+  const latestRelease = await screen.findAllByRole('button', { name: '3.0.1+rhlw.2' });
+  await userEvent.click(latestRelease[0]);
+  expect(writeText).toHaveBeenCalledWith('pip install requests==3.0.1+rhlw.2');
+
+  await userEvent.click(screen.getByRole('button', { name: '2.9.0' }));
+  expect(
+    await screen.findByRole('heading', { name: 'Releases for version 2.9.0' }),
+  ).toBeInTheDocument();
+  const olderRelease = await screen.findAllByRole('button', { name: '2.9.0+rhlw.1' });
+  await userEvent.click(olderRelease[0]);
+  expect(writeText).toHaveBeenCalledWith('pip install requests==2.9.0+rhlw.1');
+});
+
 const mockClipboard = () => {
   const writeText = jest.fn().mockResolvedValue(undefined);
   Object.assign(navigator, { clipboard: { writeText } });

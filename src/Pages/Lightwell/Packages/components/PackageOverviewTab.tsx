@@ -109,7 +109,7 @@ const PackageOverviewTab = ({
             <p>
               This package has been rebuilt by Red Hat with backported fixes for known
               vulnerabilities. The upstream version is pinned and Red Hat applies security patches
-              as sequential releases (.rhlw suffix).
+              as sequential releases {isMaven ? '(.rhlw suffix).' : '(+rhlw suffix).'}
             </p>
           ) : (
             <p>

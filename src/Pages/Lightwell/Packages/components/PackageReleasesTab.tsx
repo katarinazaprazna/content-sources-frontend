@@ -17,7 +17,10 @@ type PackageReleasesTabProps = {
 
 export const buildVersionFromRelease = (
   release: Pick<RepositoryPackageReleaseInfo, 'version' | 'release'>,
-) => `${release.version}.${release.release}`;
+) =>
+  !release.release || release.release.startsWith('+') || release.release.startsWith('.')
+    ? `${release.version}${release.release}`
+    : `${release.version}.${release.release}`;
 
 const PackageReleasesTab = ({
   version,

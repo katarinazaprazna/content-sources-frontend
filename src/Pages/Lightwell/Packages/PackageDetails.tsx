@@ -44,6 +44,7 @@ import {
   formatDistributionUrl,
   formatRepositoryName,
   lightwellReleaseNum,
+  pythonLightwellRelease,
   sortVersionsDesc,
   stripLightwellVersionSuffix,
 } from '../helpers';
@@ -191,11 +192,23 @@ const PackageDetails = () => {
     const versions = useMock
       ? (getMockLightwellPackages(repoUUID).find((pkg) => pkg.name === packageName)?.versions ?? [])
       : pythonVersionsFromApi;
-    return sortVersionsDesc(versions.map(stripLightwellVersionSuffix));
+    return sortVersionsDesc([...new Set(versions.map(stripLightwellVersionSuffix))]);
   }, [useMock, repoUUID, packageName, pythonVersionsFromApi]);
 
-  // TODO: Derive Python hasRelease from its versions API when remediated support is added
-  const hasRelease = isMaven ? mavenHasRelease : false;
+  const pythonVersionReleases = useMemo(
+    () =>
+      (pythonVersionsData?.versions ?? []).map((version) => ({
+        version: stripLightwellVersionSuffix(version.version),
+        release: pythonLightwellRelease(version.version),
+        created_at: version.last_updated,
+      })),
+    [pythonVersionsData?.versions],
+  );
+
+  const hasRelease = isMaven
+    ? mavenHasRelease
+    : repository?.security_level === 'remediated' &&
+      pythonVersionReleases.some((release) => !!release.release);
 
   const packageVersion = isMaven ? (mavenVersions[0] ?? '') : (pythonVersions[0] ?? '');
 
@@ -212,19 +225,24 @@ const PackageDetails = () => {
       .sort((a, b) => lightwellReleaseNum(b.release) - lightwellReleaseNum(a.release));
   }, [isMaven, hasRelease, mavenVersionsData?.versions, activeVersion]);
 
-  const pythonDetail = useMemo(
-    () => pythonVersionsData?.versions.find((version) => version.version === activeVersion),
-    [pythonVersionsData?.versions, activeVersion],
+  const pythonBuilds = useMemo(
+    () =>
+      hasRelease
+        ? pythonVersionReleases
+            .filter((release) => release.version === activeVersion && release.release)
+            .sort((a, b) => lightwellReleaseNum(b.release) - lightwellReleaseNum(a.release))
+        : [],
+    [hasRelease, pythonVersionReleases, activeVersion],
   );
 
-  const pythonVersionReleases = useMemo(
+  const pythonDetail = useMemo(
     () =>
-      (pythonVersionsData?.versions ?? []).map((version) => ({
-        version: version.version,
-        release: '',
-        created_at: version.last_updated,
-      })),
-    [pythonVersionsData?.versions],
+      pythonVersionsData?.versions.find(
+        (version) =>
+          version.version ===
+          (pythonBuilds[0] ? buildVersionFromRelease(pythonBuilds[0]) : activeVersion),
+      ),
+    [pythonVersionsData?.versions, pythonBuilds, activeVersion],
   );
 
   const versionOptions = isPython ? pythonVersions : mavenVersions;
@@ -264,16 +282,13 @@ const PackageDetails = () => {
 
   if (!repoUUID || isError) throw error;
 
-  const builds = isMaven && hasRelease ? mavenBuilds : (mavenDetail?.builds ?? []);
+  const builds = isMaven ? (hasRelease ? mavenBuilds : (mavenDetail?.builds ?? [])) : pythonBuilds;
   const latestBuild = builds[0];
 
   const upstreamVersion = isMaven ? (latestBuild?.version ?? activeVersion) : activeVersion;
 
-  const displayVersion = isMaven
-    ? hasRelease && latestBuild
-      ? buildVersionFromRelease(latestBuild)
-      : activeVersion
-    : activeVersion;
+  const displayVersion =
+    hasRelease && latestBuild ? buildVersionFromRelease(latestBuild) : activeVersion;
 
   const formatReleaseCopyText = (version: string) =>
     isMaven
@@ -500,9 +515,9 @@ const PackageDetails = () => {
                       <TabContentBody hasPadding>
                         <PackageReleasesTab
                           version={upstreamVersion}
-                          builds={mavenBuilds}
-                          allVersions={mavenVersions}
-                          latestReleases={mavenAllReleases}
+                          builds={isPython ? pythonBuilds : mavenBuilds}
+                          allVersions={versionOptions}
+                          latestReleases={isPython ? pythonVersionReleases : mavenAllReleases}
                           onVersionSelect={setSelectedVersion}
                           formatCopyText={formatReleaseCopyText}
                         />

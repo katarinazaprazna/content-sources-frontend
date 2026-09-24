@@ -50,7 +50,9 @@ import {
   formatDistributionUrl,
   formatRepositoryName,
   getRepositoryDescription,
+  pythonLightwellRelease,
   sortVersionsDesc,
+  stripLightwellVersionSuffix,
 } from '../helpers';
 import Hide from 'components/Hide/Hide';
 import { LIGHTWELL_USE_MOCK, lightwellPkgsPerPageKey } from '../constants';
@@ -100,13 +102,26 @@ type MappedPackage = {
   last_updated: string;
 };
 
-const mapRepositoryPackage = (pkg: RepositoryPackageItem): MappedPackage => {
+const mapRepositoryPackage = (
+  pkg: RepositoryPackageItem,
+  isPythonRemediated: boolean,
+): MappedPackage => {
   const latestCreatedAt = pkg.latest_releases
     .map((release) => release.created_at)
     .sort()
     .at(-1);
 
-  const sortedReleases = [...pkg.latest_releases].sort(compareReleasesDesc);
+  const sortedReleases = pkg.latest_releases
+    .map((release) =>
+      isPythonRemediated
+        ? {
+            ...release,
+            version: stripLightwellVersionSuffix(release.version),
+            release: release.release || pythonLightwellRelease(release.version),
+          }
+        : release,
+    )
+    .sort(compareReleasesDesc);
 
   const seenVersions = new Set<string>();
   const latestReleasePerVersion = sortedReleases.filter((release) => {
@@ -118,7 +133,11 @@ const mapRepositoryPackage = (pkg: RepositoryPackageItem): MappedPackage => {
   const sortedVersions =
     latestReleasePerVersion.length > 0
       ? latestReleasePerVersion.map((release) => release.version)
-      : sortVersionsDesc(pkg.versions);
+      : sortVersionsDesc(
+          isPythonRemediated
+            ? [...new Set(pkg.versions.map(stripLightwellVersionSuffix))]
+            : pkg.versions,
+        );
 
   return {
     group_id: pkg.group,
@@ -231,22 +250,27 @@ const PackagesTable = () => {
     isFetching: isPackagesFetching,
   } = apiPackagesQuery;
 
+  const isPythonRemediated =
+    repository?.content_type === 'python' && repository?.security_level === 'remediated';
+
   const { packages, packageCount } = useMemo(() => {
     if (useMock) {
       const mockPackages = getMockLightwellPackages(repoUUID, debouncedSearch);
       const offset = (page - 1) * perPage;
       return {
-        packages: mockPackages.slice(offset, offset + perPage).map(mapRepositoryPackage),
+        packages: mockPackages
+          .slice(offset, offset + perPage)
+          .map((pkg) => mapRepositoryPackage(pkg, isPythonRemediated)),
         packageCount: mockPackages.length,
       };
     }
 
     const results = packagesData?.results ?? [];
     return {
-      packages: results.map(mapRepositoryPackage),
+      packages: results.map((pkg) => mapRepositoryPackage(pkg, isPythonRemediated)),
       packageCount: packagesData?.total ?? 0,
     };
-  }, [useMock, repoUUID, debouncedSearch, page, perPage, packagesData]);
+  }, [useMock, repoUUID, debouncedSearch, page, perPage, packagesData, isPythonRemediated]);
 
   const rootPath = useLightwellRootPath();
   const appBreadcrumbsEnabled = useFlag('platform.chrome.app-breadcrumbs');

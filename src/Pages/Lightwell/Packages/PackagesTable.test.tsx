@@ -406,6 +406,38 @@ it('renders python remediated packages with a Latest release column', async () =
   expect(await screen.findByRole('button', { name: '2.32.0.rhlw-0002' })).toBeInTheDocument();
 });
 
+it('groups published Python releases and copies the latest version', async () => {
+  const writeText = mockClipboard();
+  mockUseParams.mockReturnValue({ repoName: getRepositoryPathSlug('python', 'remediated') });
+  mockRepository(defaultPythonRemediatedContentItem);
+  (useLightwellRepositoryPackagesQuery as jest.Mock).mockImplementation(() =>
+    mockPackagesQuery({
+      data: {
+        ...defaultLightwellRepositoryPackageResponse,
+        results: [
+          {
+            group: '',
+            name: 'lightwell-fixture',
+            versions: ['3.0.1+rhlw.1', '3.0.1+rhlw.2'],
+            latest_releases: [
+              { version: '3.0.1+rhlw.1', release: '', created_at: '2026-07-01T00:00:00Z' },
+              { version: '3.0.1+rhlw.2', release: '', created_at: '2026-07-02T00:00:00Z' },
+            ],
+          },
+        ],
+        total: 1,
+      },
+    }),
+  );
+
+  renderPackagesTable();
+
+  expect(await screen.findByText('3.0.1')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '3.0.1+rhlw.1' })).not.toBeInTheDocument();
+  await clickCopyButton('3.0.1+rhlw.2');
+  expect(writeText).toHaveBeenCalledWith('pip install lightwell-fixture==3.0.1+rhlw.2');
+});
+
 it('clears the search filter from the filtered empty state', async () => {
   (useLightwellRepositoryPackagesQuery as jest.Mock).mockImplementation(() =>
     mockPackagesQuery({
