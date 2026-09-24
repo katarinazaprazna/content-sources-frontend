@@ -1,4 +1,62 @@
+import { AlertVariant } from '@patternfly/react-core';
+
 type ExportRow = Record<string, unknown>;
+
+export type ExportFormat = 'csv' | 'pdf' | 'json';
+
+export const EXPORT_PAGE_SIZE = 200;
+
+// Notification payloads shared by every export menu so the PDF flow reads
+// identically across pages.
+export const PDF_GENERATING_NOTIFICATION = {
+  variant: AlertVariant.info,
+  title: 'Generating PDF',
+  description: 'Your PDF is being generated. The download will start when it is ready.',
+} as const;
+
+export const PDF_READY_NOTIFICATION = {
+  variant: AlertVariant.success,
+  title: 'PDF ready',
+  description: 'Your download should start shortly.',
+} as const;
+
+// Fetch every item across a paginated endpoint. `fetchPage` receives the page
+// size and a zero-based page index and returns just that page of items; the
+// caller converts the index into whatever cursor the endpoint expects (an
+// `offset` of `pageIndex * pageSize`, a 1-based `pageIndex + 1`, etc.).
+export async function fetchAllPages<T>(
+  fetchPage: (pageSize: number, pageIndex: number) => Promise<T[]>,
+  pageSize: number = EXPORT_PAGE_SIZE,
+): Promise<T[]> {
+  const items: T[] = [];
+  let pageIndex = 0;
+
+  while (true) {
+    const page = await fetchPage(pageSize, pageIndex);
+    items.push(...page);
+
+    if (page.length < pageSize) {
+      break;
+    }
+
+    pageIndex += 1;
+  }
+
+  return items;
+}
+
+// Resolve the total item count for a PDF export, preferring a count the caller
+// already has and otherwise falling back to a lightweight metadata request.
+export async function resolvePdfItemCount(
+  itemCount: number,
+  fetchCount: () => Promise<number>,
+): Promise<number> {
+  if (itemCount > 0) {
+    return itemCount;
+  }
+
+  return fetchCount();
+}
 
 function csvCell(value: string): string {
   if (/[",\n\r]/.test(value)) {
