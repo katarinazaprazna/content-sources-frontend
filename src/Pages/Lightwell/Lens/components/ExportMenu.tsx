@@ -30,8 +30,8 @@ export function ExportMenu({ uuid, filename, filters }: ExportMenuProps) {
     <ExportMenuBase
       isReady={Boolean(uuid)}
       ouiaId='lightwell-coverage-export-toggle'
-      csvFilename={`lightwell--match-analysis-${uuid}.csv`}
-      jsonFilename={`lightwell--match-analysis-${uuid}.json`}
+      csvFilename={`lightwell-match-analysis-${uuid}.csv`}
+      jsonFilename={`lightwell-match-analysis-${uuid}.json`}
       fetchRows={() => fetchAllCoveragePackages(uuid!, filters)}
       buildPdfRequest={async () => {
         const count = await resolvePdfItemCount(0, () =>
